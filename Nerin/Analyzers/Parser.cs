@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nerin
+namespace Nerin.Analyzers
 {
-    internal class Program
+    public class Parser
     {
-        static void Main(string[] args)
-        {
-            
-        }
+        
     }
 }
