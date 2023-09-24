@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nerin.Analyzers.Items
 {
-    enum TokensKind
+    public enum TokensKind
     {
         Number,
         Plus,
@@ -16,11 +16,12 @@ namespace Nerin.Analyzers.Items
         LeftBracket,
         RightBracket,
         Space,
-        Bad
+        Bad,
+        End
     }
 
     // Low-level token
-    class SyntaxToken
+    public class SyntaxToken
     {
         public TokensKind Kind { get; }
         public string Text { get; }

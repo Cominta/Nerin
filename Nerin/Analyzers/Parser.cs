@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nerin.Analyzers
 {
+    // Makes High-level tokens (Expr)
     public class Parser
     {
         
