@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Nerin.Analyzers.Items;
+using Nerin.Analyzers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +16,15 @@ namespace Nerin.NerinIDE
     {
         private TextBox Console;
         private Button Compile;
+        private string _inputText;
+        private string _result;
 
+        public string GetText()
+        {
+            return _inputText;
+        }
+
+        //Main window settings
         public NideMain()
         {
             InitializeComponent();
@@ -25,6 +35,7 @@ namespace Nerin.NerinIDE
             Console.Multiline = true;
             Console.Dock = DockStyle.Fill;
             Console.ScrollBars = ScrollBars.Both;
+            Console.TextChanged += Console_TextChanged;
             this.Controls.Add(Console);
 
             Compile = new Button();
@@ -42,7 +53,7 @@ namespace Nerin.NerinIDE
             ShowConsole();
         }
 
-        //Ctrl + F5 checkout
+        // Ctrl + F5 checkout
         private void NideMain_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.F5)
@@ -53,6 +64,17 @@ namespace Nerin.NerinIDE
 
         private void ShowConsole()
         {
+            string currentStr = GetText();
+            Parser parser = new Parser();
+
+            //Show result in console
+            Expr result = null;
+            parser.SetText(currentStr);
+            result = parser.Parse();
+            Evaulator evaulator = new Evaulator(result);
+            _result = evaulator.Evaluate().ToString();
+
+            //Console settings
             Form textDisplayForm = new Form();
             textDisplayForm.Text = "Console";
             textDisplayForm.Size = new System.Drawing.Size(700, 400);
@@ -63,10 +85,18 @@ namespace Nerin.NerinIDE
             displayTextBox.ScrollBars = ScrollBars.Both;
 
             displayTextBox.ReadOnly = true;
-            displayTextBox.Text = Console.Text;
+
+            displayTextBox.Text = _result;
+            
             textDisplayForm.Controls.Add(displayTextBox);
 
             textDisplayForm.ShowDialog();
+        }
+
+        // Save text to _inputText
+        private void Console_TextChanged(object sender, EventArgs e)
+        {
+            _inputText = Console.Text;
         }
 
         public void Start()

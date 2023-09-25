@@ -11,7 +11,7 @@ namespace Nerin.Analyzers
     {
         private Expr root { get; }
 
-        public Evaulator(Expr root) 
+        public Evaulator(Expr root)
         {
             this.root = root;
         }
@@ -21,7 +21,7 @@ namespace Nerin.Analyzers
             return Evaluate(root);
         }
 
-        private int Evaluate(Expr node) 
+        private int Evaluate(Expr node)
         {
             if (node.Kind == TokensKind.LiteralExpr)
             {
@@ -60,6 +60,6 @@ namespace Nerin.Analyzers
             }
 
             throw new Exception("Failed to evaluate");
-        }   
+        }
     }
 }

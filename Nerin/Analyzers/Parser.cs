@@ -1,4 +1,4 @@
-﻿using Nerin.Analyzers.Items;
+using Nerin.Analyzers.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,18 +15,18 @@ namespace Nerin.Analyzers
         private int pos;
         List<SyntaxToken> tokens;
 
-        public Parser(string text) 
+        public Parser(string text)
         {
             tokens = new List<SyntaxToken>();
             SetText(text);
         }
 
-        public Parser() 
+        public Parser()
         {
             tokens = new List<SyntaxToken>();
         }
 
-        public void SetText(string text) 
+        public void SetText(string text)
         {
             this.text = text;
             this.pos = 0;
@@ -37,8 +37,8 @@ namespace Nerin.Analyzers
         private SyntaxToken Peek(int offset)
         {
             int index = pos + offset;
-            
-            if (index >= text.Length) 
+
+            if (index >= text.Length)
             {
                 return tokens[tokens.Count - 1];
             }
@@ -67,7 +67,7 @@ namespace Nerin.Analyzers
 
         private void SyntaxParse()
         {
-            if (tokens.Count != 0) 
+            if (tokens.Count != 0)
             {
                 tokens.Clear();
             }
@@ -94,7 +94,7 @@ namespace Nerin.Analyzers
             {
                 int priority = GetBinaryOperatorPriority(Current.Kind);
 
-                if (priority == 0 ||  priority <= parentPriority)
+                if (priority == 0 || priority <= parentPriority)
                 {
                     break;
                 }
@@ -116,11 +116,11 @@ namespace Nerin.Analyzers
                 case TokensKind.Divide:
                     return 2;
 
-                case TokensKind.Plus: 
+                case TokensKind.Plus:
                 case TokensKind.Minus:
                     return 1;
 
-                default: 
+                default:
                     return 0;
             }
         }

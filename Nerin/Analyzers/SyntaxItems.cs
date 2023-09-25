@@ -70,7 +70,7 @@ namespace Nerin.Analyzers.Items
 
         public override IEnumerable<object> GetChild()
         {
-            yield return Left; 
+            yield return Left;
             yield return Operator;
             yield return Right;
         }
