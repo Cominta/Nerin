@@ -1,5 +1,6 @@
 ﻿using Nerin.Analyzers;
 using Nerin.Analyzers.Items;
+using Nerin.NerinIDE;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,9 @@ namespace Nerin
     {
         static void Main(string[] args)
         {
+            NideMain nide = new NideMain();
+            nide.Start();
+
             string currentStr = "";
             Parser parser = new Parser();
 
