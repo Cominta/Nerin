@@ -1,4 +1,4 @@
-﻿using Nerin.Analyzers;
+using Nerin.Analyzers;
 using Nerin.Analyzers.Items;
 using Nerin.NerinIDE;
 using System;

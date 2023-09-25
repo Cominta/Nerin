@@ -1,4 +1,4 @@
-﻿using Nerin.Analyzers.Items;
+using Nerin.Analyzers.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
