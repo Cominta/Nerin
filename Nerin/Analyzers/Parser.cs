@@ -75,7 +75,7 @@ namespace Nerin.Analyzers
             Lexer lexer = new Lexer(text);
             SyntaxToken current = new SyntaxToken(TokensKind.Space, null, null);
 
-            while (current.Kind != TokensKind.End)
+            while (current.Kind != TokensKind.End && current.Kind != TokensKind.Bad)
             {
                 current = lexer.NextToken();
 
@@ -86,14 +86,21 @@ namespace Nerin.Analyzers
             }
         }
 
-        public Expr ParseTerm()
+        public Expr Parse(int parentPriority = 0)
         {
-            Expr left = ParseFactor();
+            Expr left = ParsePrimary();
 
-            while (Current.Kind == TokensKind.Plus || Current.Kind == TokensKind.Minus)
+            while (true)
             {
+                int priority = GetBinaryOperatorPriority(Current.Kind);
+
+                if (priority == 0 ||  priority <= parentPriority)
+                {
+                    break;
+                }
+
                 SyntaxToken _operator = NextToken();
-                Expr right = ParseFactor();
+                Expr right = Parse(priority);
 
                 left = new BinaryExpr(left, right, _operator);
             }
@@ -101,26 +108,37 @@ namespace Nerin.Analyzers
             return left;
         }
 
-        public Expr ParseFactor()
+        private static int GetBinaryOperatorPriority(TokensKind kind)
         {
-            Expr left = ParsePrimary();
-
-            while (Current.Kind == TokensKind.Multi || Current.Kind == TokensKind.Divide)
+            switch (kind)
             {
-                SyntaxToken _operator = NextToken();
-                Expr right = ParsePrimary(); 
+                case TokensKind.Multi:
+                case TokensKind.Divide:
+                    return 2;
 
-                left = new BinaryExpr(left, right, _operator);
+                case TokensKind.Plus: 
+                case TokensKind.Minus:
+                    return 1;
+
+                default: 
+                    return 0;
             }
-
-            return left;
         }
 
         private Expr ParsePrimary()
         {
+            if (Current.Kind == TokensKind.LeftBracket)
+            {
+                SyntaxToken left = NextToken();
+                Expr expr = Parse();
+                SyntaxToken right = Match(TokensKind.RightBracket);
+
+                return new BracketsExpr(left, right, expr);
+            }
+
             SyntaxToken number = Match(TokensKind.Number);
 
-            return new NumberExpr(number);
+            return new LiteralExpr(number);
         }
     }
 }

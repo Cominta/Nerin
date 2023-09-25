@@ -23,9 +23,9 @@ namespace Nerin.Analyzers
 
         private int Evaluate(Expr node) 
         {
-            if (node.Kind == TokensKind.NumberExpr)
+            if (node.Kind == TokensKind.LiteralExpr)
             {
-                return (int)((NumberExpr)node).Number.Value;
+                return (int)((LiteralExpr)node).Literal.Value;
             }
 
             if (node.Kind == TokensKind.BinaryExpr)
@@ -52,6 +52,11 @@ namespace Nerin.Analyzers
                 {
                     return left / right;
                 }
+            }
+
+            if (node.Kind == TokensKind.BracketsExpr)
+            {
+                return Evaluate(((BracketsExpr)node).Expression);
             }
 
             throw new Exception("Failed to evaluate");

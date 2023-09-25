@@ -22,42 +22,55 @@ namespace Nerin
 
                 Expr result = null;
                 parser.SetText(currentStr);
-                result = parser.ParseTerm();
+                result = parser.Parse();
                 Evaulator evaulator = new Evaulator(result);
 
                 ConsoleColor color = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
 
-                Print("  ", result);
-                Console.WriteLine($"Result = {evaulator.Evaluate()}");
+                bool errors = false;
+                Print("  ", result, ref errors);
+
+                if (!errors)
+                {
+                    Console.WriteLine($"Result = {evaulator.Evaluate()}");
+                }
 
                 Console.ForegroundColor = color;
             }
         }
 
-        static void Print(string indent, Expr node, bool isLast = true)
+        static void Print(string indent, Expr node, ref bool errors, bool isLast = true)
         {
             // ├ │ └ ─ 
             string marker = isLast ? "└──" : "├──";
 
             Console.Write(indent);
             Console.Write(marker);
-            Console.Write(node.Kind);
 
-            if (node is SyntaxToken token && token.Value != null) 
+            if (node is SyntaxToken token && token.Kind == TokensKind.Bad)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                errors = true;
+            }
+
+            Console.Write(node.Kind);
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+
+            if (node is SyntaxToken _token && _token.Value != null) 
             {
                 Console.Write(" ");
-                Console.Write(token.Value);
+                Console.Write(_token.Value);
             }
 
             Console.WriteLine();
-            indent += isLast ? "     " : "│    ";
+            indent += isLast ? "    " : "│   ";
 
             object lastChild = node.GetChild().LastOrDefault();
 
             foreach (Expr child in node.GetChild())
             {
-                Print(indent, child, child == lastChild);
+                Print(indent, child, ref errors, child == lastChild);
             }
         }
     }

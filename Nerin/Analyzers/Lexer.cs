@@ -72,43 +72,26 @@ namespace Nerin.Analyzers
             }
 
             // Operators
-            else if (Current == '+')
+            switch (Current)
             {
-                NextPos();
-                return new SyntaxToken(TokensKind.Plus, "+", null);
+                case '+':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.Plus, "+", null);
+
+                case '-':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.Minus, "-", null);
+
+                case '*':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.Multi, "*", null);
+
+                case '/':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.Divide, "/", null);
             }
 
-            else if (Current == '-')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.Minus, "-", null);
-            }
-
-            else if (Current == '*')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.Multi, "*", null);
-            }
-
-            else if (Current == '/')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.Divide, "/", null);
-            }
-
-            else if (Current == ')')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.RightBracket, ")", null);
-            }
-
-            else if (Current == '(')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.LeftBracket, "(", null);
-            }
-
-            else if (Current == ' ')
+            if (Current == ' ')
             {
                 NextPos();
                 return new SyntaxToken(TokensKind.Space, " ", null);
