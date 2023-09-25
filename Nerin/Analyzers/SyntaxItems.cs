@@ -9,18 +9,23 @@ namespace Nerin.Analyzers.Items
 {
     public enum TokensKind
     {
+        Space,
+        Bad,
+        End,
+
         Number,
+
         Plus,
         Minus,
         Divide,
         Multi,
+
         LeftBracket,
         RightBracket,
-        Space,
-        Bad,
-        End,
+
         BinaryExpr,
-        NumberExpr
+        BracketsExpr,
+        LiteralExpr
     }
 
     // Low-level token
@@ -65,25 +70,47 @@ namespace Nerin.Analyzers.Items
 
         public override IEnumerable<object> GetChild()
         {
-            yield return Left; 
+            yield return Left;
             yield return Operator;
             yield return Right;
         }
     }
 
-    class NumberExpr : Expr
+    class BracketsExpr : Expr
     {
-        public SyntaxToken Number { get; }
-        public override TokensKind Kind => TokensKind.NumberExpr;
+        public SyntaxToken LeftBracket { get; }
+        public SyntaxToken RightBracket { get; }
+        public Expr Expression { get; }
+        public override TokensKind Kind => TokensKind.BracketsExpr;
 
-        public NumberExpr(SyntaxToken number)
+        public BracketsExpr(SyntaxToken leftBracket, SyntaxToken rightBracket, Expr expression)
         {
-            Number = number;
+            LeftBracket = leftBracket;
+            RightBracket = rightBracket;
+            Expression = expression;
         }
 
         public override IEnumerable<object> GetChild()
         {
-            yield return Number;
+            yield return LeftBracket;
+            yield return Expression;
+            yield return RightBracket;
+        }
+    }
+
+    class LiteralExpr : Expr
+    {
+        public SyntaxToken Literal { get; }
+        public override TokensKind Kind => TokensKind.LiteralExpr;
+
+        public LiteralExpr(SyntaxToken literal)
+        {
+            Literal = literal;
+        }
+
+        public override IEnumerable<object> GetChild()
+        {
+            yield return Literal;
         }
     }
 }
