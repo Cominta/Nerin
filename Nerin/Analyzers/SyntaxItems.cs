@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,13 +18,15 @@ namespace Nerin.Analyzers.Items
         RightBracket,
         Space,
         Bad,
-        End
+        End,
+        BinaryExpr,
+        NumberExpr
     }
 
     // Low-level token
-    public class SyntaxToken
+    public class SyntaxToken : Expr
     {
-        public TokensKind Kind { get; }
+        public override TokensKind Kind { get; }
         public string Text { get; }
         public object Value { get; }
 
@@ -33,11 +36,17 @@ namespace Nerin.Analyzers.Items
             Text = text;
             Value = value;
         }
+
+        public override IEnumerable<object> GetChild()
+        {
+            return Enumerable.Empty<Expr>();
+        }
     }
 
-    abstract class Expr
+    public abstract class Expr
     {
-
+        public abstract TokensKind Kind { get; }
+        public abstract IEnumerable<object> GetChild();
     }
 
     class BinaryExpr : Expr
@@ -45,6 +54,7 @@ namespace Nerin.Analyzers.Items
         public Expr Left { get; }
         public Expr Right { get; }
         public SyntaxToken Operator { get; }
+        public override TokensKind Kind => TokensKind.BinaryExpr;
 
         public BinaryExpr(Expr left, Expr right, SyntaxToken _operator)
         {
@@ -52,15 +62,28 @@ namespace Nerin.Analyzers.Items
             Right = right;
             Operator = _operator;
         }
+
+        public override IEnumerable<object> GetChild()
+        {
+            yield return Left; 
+            yield return Operator;
+            yield return Right;
+        }
     }
 
     class NumberExpr : Expr
     {
         public SyntaxToken Number { get; }
+        public override TokensKind Kind => TokensKind.NumberExpr;
 
         public NumberExpr(SyntaxToken number)
         {
             Number = number;
+        }
+
+        public override IEnumerable<object> GetChild()
+        {
+            yield return Number;
         }
     }
 }

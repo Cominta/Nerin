@@ -12,36 +12,52 @@ namespace Nerin
     {
         static void Main(string[] args)
         {
-            string[] examples = new string[]
+            string currentStr = "";
+            Parser parser = new Parser();
+
+            while (true)
             {
-                "1 + 2 * 3",
-                "342+4- 2",
-                "4*21-4391",
-                "25/312-3",
-                "32 + 2-23/1",
-                "DSD2-2",
-                "248_0+2"
-            };
+                Console.Write("> ");
+                currentStr = Console.ReadLine();
 
-            Lexer lexer = new Lexer();
+                Expr result = null;
+                parser.SetText(currentStr);
+                result = parser.ParseTerm();
+                Evaulator evaulator = new Evaulator(result);
 
-            for (int i = 0; i < examples.Length; i++)
+                ConsoleColor color = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+
+                Print("  ", result);
+                Console.WriteLine($"Result = {evaulator.Evaluate()}");
+
+                Console.ForegroundColor = color;
+            }
+        }
+
+        static void Print(string indent, Expr node, bool isLast = true)
+        {
+            // ├ │ └ ─ 
+            string marker = isLast ? "└──" : "├──";
+
+            Console.Write(indent);
+            Console.Write(marker);
+            Console.Write(node.Kind);
+
+            if (node is SyntaxToken token && token.Value != null) 
             {
-                Console.WriteLine("Current example: " + examples[i]);
-                lexer.SetText(examples[i]);
-                SyntaxToken current = new SyntaxToken(TokensKind.Space, null, null);
+                Console.Write(" ");
+                Console.Write(token.Value);
+            }
 
-                while (current.Kind != TokensKind.End && current.Kind != TokensKind.Bad)
-                {
-                    current = lexer.NextToken();
+            Console.WriteLine();
+            indent += isLast ? "     " : "│    ";
 
-                    if (current.Kind != TokensKind.Space) 
-                    {
-                        Console.WriteLine($"{current.Kind}: text = {current.Text}, value = {current.Value}");
-                    }
-                }
+            object lastChild = node.GetChild().LastOrDefault();
 
-                Console.WriteLine("---------------------");
+            foreach (Expr child in node.GetChild())
+            {
+                Print(indent, child, child == lastChild);
             }
         }
     }
