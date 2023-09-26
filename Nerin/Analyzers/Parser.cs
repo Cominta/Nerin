@@ -91,7 +91,7 @@ namespace Nerin.Analyzers
             Expr left;
             int unaryPriority = Current.Kind.GetUnaryOperatorPriority();
 
-            if (unaryPriority != 0 && unaryPriority > parentPriority)
+            if (unaryPriority != 0 && unaryPriority >= parentPriority)
             {
                 SyntaxToken _operator = NextToken();
                 Expr operand = Parse(unaryPriority);
