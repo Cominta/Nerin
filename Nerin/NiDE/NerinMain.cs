@@ -58,6 +58,7 @@ namespace Nerin.NerinIDE
             MainWindow.Dock = DockStyle.Bottom;
             MainWindow.ScrollBars = ScrollBars.Both;
             MainWindow.TextChanged += Console_TextChanged;
+            MainWindow.TextChanged += MainWindow_TextChanged;
             MainWindow.BorderStyle = BorderStyle.FixedSingle;
 
             //Main window colors
@@ -84,7 +85,44 @@ namespace Nerin.NerinIDE
         //Button checkout
         private void Compile_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(GetText()))
+            {
+                MainWindow.ForeColor = Color.White;
+                return;
+            }
+
             ShowConsole();
+        }
+
+        private void MainWindow_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(MainWindow.Text))
+            {
+                MainWindow.ForeColor = Color.White;
+                return; 
+            }
+
+            try
+            {
+                string[] lines = MainWindow.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                Parser parser = new Parser();
+
+                foreach (string line in lines)
+                {
+                    Expr result = null;
+                    parser.SetText(line);
+                    result = parser.Parse();
+                    Evaulator evaulator = new Evaulator(result);
+
+                    string lineResult = evaulator.Evaluate().ToString();
+                }
+
+                MainWindow.ForeColor = Color.FromArgb(255, 255, 255);
+            }
+            catch (Exception ex)
+            {
+                MainWindow.ForeColor = Color.Red;
+            }
         }
 
         private void ShowConsole()
@@ -94,17 +132,34 @@ namespace Nerin.NerinIDE
 
             Parser parser = new Parser();
 
-            foreach (string line in lines)
+            if (string.IsNullOrWhiteSpace(GetText()))
             {
-                // Show result in console for each line
-                Expr result = null;
-                parser.SetText(line);
-                result = parser.Parse();
-                Evaulator evaulator = new Evaulator(result);
-                string lineResult = evaulator.Evaluate().ToString();
-
-                resultBuilder.AppendLine(lineResult);
+                MainWindow.ForeColor = Color.White;
+                return;
             }
+
+            try
+            {
+                foreach (string line in lines)
+                {
+                    // Show result in console for each line
+                    Expr result = null;
+                    parser.SetText(line);
+                    result = parser.Parse();
+                    Evaulator evaulator = new Evaulator(result);
+
+                    string lineResult = evaulator.Evaluate().ToString();
+
+                    resultBuilder.AppendLine(lineResult);
+                }
+            }
+            catch (Exception ex)
+            {
+                MainWindow.ForeColor = Color.Red;
+                return;
+            }
+
+            MainWindow.ForeColor = Color.White;
 
             // Console settings
             Form ConsoleWindow = new Form();
