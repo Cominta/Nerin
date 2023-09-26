@@ -28,29 +28,38 @@ namespace Nerin.Analyzers
                 return (int)((LiteralExpr)node).Literal.Value;
             }
 
+            if (node.Kind == TokensKind.UnaryExpr)
+            {
+                int result = Evaluate(((UnaryExpr)node).Expression);
+                
+                switch (((UnaryExpr)node).Unary.Kind)
+                {
+                    case TokensKind.Plus:
+                        return result;
+
+                    case TokensKind.Minus: 
+                        return -result;
+                }
+            }
+
             if (node.Kind == TokensKind.BinaryExpr)
             {
                 int left = Evaluate(((BinaryExpr)node).Left);
                 int right = Evaluate(((BinaryExpr)node).Right);
 
-                if (((BinaryExpr)node).Operator.Kind == TokensKind.Minus)
+                switch (((BinaryExpr)node).Operator.Kind)
                 {
-                    return left - right;
-                }
+                    case TokensKind.Plus:
+                        return left + right;
 
-                if (((BinaryExpr)node).Operator.Kind == TokensKind.Plus)
-                {
-                    return left + right;
-                }
+                    case TokensKind.Minus:
+                        return left - right;
 
-                if (((BinaryExpr)node).Operator.Kind == TokensKind.Multi)
-                {
-                    return left * right;
-                }
+                    case TokensKind.Multi:
+                        return left * right;
 
-                if (((BinaryExpr)node).Operator.Kind == TokensKind.Divide)
-                {
-                    return left / right;
+                    case TokensKind.Divide:
+                        return left / right;
                 }
             }
 

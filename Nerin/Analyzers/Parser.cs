@@ -88,11 +88,26 @@ namespace Nerin.Analyzers
 
         public Expr Parse(int parentPriority = 0)
         {
-            Expr left = ParsePrimary();
+            Expr left;
+            int unaryPriority = Current.Kind.GetUnaryOperatorPriority();
+
+            if (unaryPriority != 0 && unaryPriority > parentPriority)
+            {
+                SyntaxToken _operator = NextToken();
+                Expr operand = Parse(unaryPriority);
+
+                left = new UnaryExpr(operand, _operator);
+            }
+
+            else
+            {
+                left = ParsePrimary();
+            } 
+                
 
             while (true)
             {
-                int priority = GetBinaryOperatorPriority(Current.Kind);
+                int priority = Current.Kind.GetBinaryOperatorPriority();
 
                 if (priority == 0 || priority <= parentPriority)
                 {
@@ -106,23 +121,6 @@ namespace Nerin.Analyzers
             }
 
             return left;
-        }
-
-        private static int GetBinaryOperatorPriority(TokensKind kind)
-        {
-            switch (kind)
-            {
-                case TokensKind.Multi:
-                case TokensKind.Divide:
-                    return 2;
-
-                case TokensKind.Plus:
-                case TokensKind.Minus:
-                    return 1;
-
-                default:
-                    return 0;
-            }
         }
 
         private Expr ParsePrimary()

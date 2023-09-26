@@ -49,6 +49,7 @@
     <Compile Include="Analyzers\Lexer.cs" />
     <Compile Include="Analyzers\Parser.cs" />
     <Compile Include="Analyzers\SyntaxItems.cs" />
+    <Compile Include="Analyzers\SyntaxPriority.cs" />
     <Compile Include="NiDE\NerinMain.cs">
       <SubType>Form</SubType>
     </Compile>

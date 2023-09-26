@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Nerin.Analyzers
 {
@@ -95,6 +96,18 @@ namespace Nerin.Analyzers
             {
                 NextPos();
                 return new SyntaxToken(TokensKind.Space, " ", null);
+            }
+
+            if (Current == '(')
+            {
+                NextPos();
+                return new SyntaxToken(TokensKind.LeftBracket, "(", null);
+            }
+
+            else if (Current == ')')
+            {
+                NextPos();
+                return new SyntaxToken(TokensKind.RightBracket, ")", null);
             }
 
             return new SyntaxToken(TokensKind.Bad, null, null);

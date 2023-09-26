@@ -25,7 +25,8 @@ namespace Nerin.Analyzers.Items
 
         BinaryExpr,
         BracketsExpr,
-        LiteralExpr
+        LiteralExpr,
+        UnaryExpr
     }
 
     // Low-level token
@@ -111,6 +112,25 @@ namespace Nerin.Analyzers.Items
         public override IEnumerable<object> GetChild()
         {
             yield return Literal;
+        }
+    }
+
+    class UnaryExpr : Expr
+    {
+        public Expr Expression { get; }
+        public SyntaxToken Unary { get; }
+        public override TokensKind Kind => TokensKind.UnaryExpr;
+
+        public UnaryExpr(Expr expression, SyntaxToken token)
+        {
+            Expression = expression;
+            Unary = token;
+        }
+
+        public override IEnumerable<object> GetChild()
+        {
+            yield return Unary;
+            yield return Expression;
         }
     }
 }
