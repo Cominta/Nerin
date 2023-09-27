@@ -28,49 +28,6 @@ namespace Nerin.NerinIDE
         public NideMain()
         {
             InitializeComponent();
-
-            Panel panel = new Panel();
-            panel.Dock = DockStyle.Fill;
-            this.Controls.Add(panel);
-
-            Compile = new Button();
-            Compile.Text = "Compile";
-            Compile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Compile.Margin = new Padding(10);
-            Compile.Location = new Point(panel.ClientSize.Width - Compile.Width - 50, 10); // Button position
-            Compile.Click += Compile_Click;
-
-            //Add events
-            Compile.MouseEnter += Compile_MouseEnter;
-            Compile.MouseLeave += Compile_MouseLeave;
-
-            panel.BorderStyle = BorderStyle.FixedSingle;
-            panel.Controls.Add(Compile);
-            panel.BackColor = Color.FromArgb(38, 38, 38); //Panel color
-
-            //Button colors
-            Compile.BackColor = Color.FromArgb(67, 67, 67);
-            Compile.ForeColor = Color.FromArgb(255, 255, 255);
-
-            //Main window - only for text
-            MainWindow = new TextBox();
-            MainWindow.Multiline = true;
-            MainWindow.Dock = DockStyle.Bottom;
-            MainWindow.ScrollBars = ScrollBars.Both;
-            MainWindow.TextChanged += Console_TextChanged;
-            MainWindow.TextChanged += MainWindow_TextChanged;
-            MainWindow.BorderStyle = BorderStyle.FixedSingle;
-
-            //Main window colors
-            MainWindow.BackColor = Color.FromArgb(67, 67, 67);
-            MainWindow.ForeColor = Color.FromArgb(255, 255, 255);
-
-            MainWindow.Height = ClientSize.Height - 40;
-
-            panel.Controls.Add(MainWindow);
-
-            this.KeyPreview = true;
-            this.KeyDown += NideMain_KeyDown;
         }
 
         // Ctrl + F5 checkout
@@ -78,20 +35,30 @@ namespace Nerin.NerinIDE
         {
             if (e.Control && e.KeyCode == Keys.F5)
             {
-                ShowConsole();
+                try
+                {
+                    ShowConsole();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("The program cannot be compiled because the code contains errors", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MainWindow.ForeColor = Color.Red;
+                }
             }
         }
 
         //Button checkout
         private void Compile_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(GetText()))
+            try
             {
-                MainWindow.ForeColor = Color.White;
-                return;
+                ShowConsole();
             }
-
-            ShowConsole();
+            catch (Exception ex)
+            {
+                MessageBox.Show("The program cannot be compiled because the code contains errors", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MainWindow.ForeColor = Color.Red;
+            }
         }
 
         private void MainWindow_TextChanged(object sender, EventArgs e)
@@ -99,7 +66,7 @@ namespace Nerin.NerinIDE
             if (string.IsNullOrWhiteSpace(MainWindow.Text))
             {
                 MainWindow.ForeColor = Color.White;
-                return; 
+                return;
             }
 
             try
