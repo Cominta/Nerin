@@ -45,7 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analyzers\Evaulator.cs" />
+    <Compile Include="Analyzers\Binder\Binder.cs" />
+    <Compile Include="Analyzers\Binder\BinderItems.cs" />
+    <Compile Include="Evaulator.cs" />
     <Compile Include="Analyzers\Lexer.cs" />
     <Compile Include="Analyzers\Parser.cs" />
     <Compile Include="Analyzers\SyntaxItems.cs" />

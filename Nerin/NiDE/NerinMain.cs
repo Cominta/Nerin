@@ -79,9 +79,9 @@ namespace Nerin.NerinIDE
                     Expr result = null;
                     parser.SetText(line);
                     result = parser.Parse();
-                    Evaulator evaulator = new Evaulator(result);
+                    //Evaulator evaulator = new Evaulator(result);
 
-                    string lineResult = evaulator.Evaluate().ToString();
+                    //string lineResult = evaulator.Evaluate().ToString();
                 }
 
                 MainWindow.ForeColor = Color.FromArgb(255, 255, 255);
@@ -113,11 +113,11 @@ namespace Nerin.NerinIDE
                     Expr result = null;
                     parser.SetText(line);
                     result = parser.Parse();
-                    Evaulator evaulator = new Evaulator(result);
+                    //Evaulator evaulator = new Evaulator(result);
 
-                    string lineResult = evaulator.Evaluate().ToString();
+                    //string lineResult = evaulator.Evaluate().ToString();
 
-                    resultBuilder.AppendLine(lineResult);
+                    //resultBuilder.AppendLine(lineResult);
                 }
             }
             catch (Exception ex)
