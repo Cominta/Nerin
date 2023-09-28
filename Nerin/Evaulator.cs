@@ -17,50 +17,59 @@ namespace Nerin
             this.root = root;
         }
 
-        public int Evaluate()
+        public object Evaluate()
         {
             return Evaluate(root);
         }
 
-        private int Evaluate(BoundExpr node)
+        private object Evaluate(BoundExpr node)
         {
             if (node.Kind == BoundNodeKind.LiteralExpr)
             {
-                return (int)((BoundLiteralExpr)node).Value;
+                return ((BoundLiteralExpr)node).Value;
             }
 
             if (node.Kind == BoundNodeKind.UnaryExpr)
             {
-                int result = Evaluate(((BoundUnaryExpr)node).Operand);
+                object result = Evaluate(((BoundUnaryExpr)node).Operand);
                 
-                switch (((BoundUnaryExpr)node).OperatorKind)
+                switch (((BoundUnaryExpr)node).Operator.BoundKind)
                 {
-                    case BoundUnaryOperatorKind.Identity:
-                        return result;
+                    case BoundUnaryOperatorKind.Plus:
+                        return (int)result;
 
-                    case BoundUnaryOperatorKind.Negation: 
-                        return -result;
+                    case BoundUnaryOperatorKind.Minus: 
+                        return -(int)result;
+
+                    case BoundUnaryOperatorKind.LogicalNegation: 
+                        return !(bool)(result);
                 }
             }
 
             if (node.Kind == BoundNodeKind.BinaryExpr)
             {
-                int left = Evaluate(((BoundBinaryExpr)node).Left);
-                int right = Evaluate(((BoundBinaryExpr)node).Right);
+                object left = Evaluate(((BoundBinaryExpr)node).Left);
+                object right = Evaluate(((BoundBinaryExpr)node).Right);
 
-                switch (((BoundBinaryExpr)node).Operator)
+                switch (((BoundBinaryExpr)node).Operator.BoundKind)
                 {
                     case BoundBinaryOperatorKind.Addition:
-                        return left + right;
+                        return (int)left + (int)right;
 
                     case BoundBinaryOperatorKind.Substraction:
-                        return left - right;
+                        return (int)left - (int)right;
 
                     case BoundBinaryOperatorKind.Multiplication:
-                        return left * right;
+                        return (int)left * (int)right;
 
                     case BoundBinaryOperatorKind.Division:
-                        return left / right;
+                        return (int)left / (int)right;
+
+                    case BoundBinaryOperatorKind.LogicalAnd:
+                        return (bool)left && (bool)right;
+
+                    case BoundBinaryOperatorKind.LogicalOr:
+                        return (bool)left || (bool)right;
                 }
             }
 

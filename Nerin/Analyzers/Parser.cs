@@ -134,6 +134,12 @@ namespace Nerin.Analyzers
                 return new BracketsExpr(left, right, expr);
             }
 
+            else if (Current.Kind == TokensKind.TrueValue || 
+                     Current.Kind == TokensKind.FalseValue)
+            {
+                return new LiteralExpr(NextToken());
+            }
+
             SyntaxToken number = Match(TokensKind.Number);
 
             return new LiteralExpr(number);

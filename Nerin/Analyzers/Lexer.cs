@@ -13,17 +13,16 @@ namespace Nerin.Analyzers
     {
         private string text;
         private int pos;
-        private char Current
-        {
-            get
-            {
-                if (pos >= text.Length)
-                {
-                    return '\0';
-                }
+        private char Current => Peek(0);
 
-                return text[pos];
+        private char Peek(int offset)
+        {
+            if (pos >= text.Length)
+            {
+                return '\0';
             }
+
+            return text[pos];
         }
 
         public Lexer(string text)
@@ -72,6 +71,22 @@ namespace Nerin.Analyzers
                 return new SyntaxToken(TokensKind.Number, numberStr, number);
             }
 
+            // 
+            else if (char.IsLetter(Current))
+            {
+                int startIndex = pos;
+
+                while (char.IsLetter(Current))
+                {
+                    NextPos();
+                }
+
+                string word = text.Substring(startIndex, pos - startIndex);
+                TokensKind kind = SyntaxPriority.GetKeywordKind(word);
+
+                return new SyntaxToken(kind, word, bool.Parse(word));
+            }
+
             // Operators
             switch (Current)
             {
@@ -90,24 +105,40 @@ namespace Nerin.Analyzers
                 case '/':
                     NextPos();
                     return new SyntaxToken(TokensKind.Divide, "/", null);
+
+                case '(':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.LeftBracket, "(", null);
+
+                case ')':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.RightBracket, ")", null);
+
+                case '!':
+                    NextPos();
+                    return new SyntaxToken(TokensKind.OppositeBool, "!", null);
+
+                case '&':
+                    if (Peek(1) == '&')
+                    {
+                        pos += 2;
+                        return new SyntaxToken(TokensKind.And, "&", null);
+                    }
+                    break;
+
+                case '|':
+                    if (Peek(1) == '|')
+                    {
+                        pos += 2;
+                        return new SyntaxToken(TokensKind.Or, "|", null);
+                    }
+                    break;
             }
 
             if (Current == ' ')
             {
                 NextPos();
                 return new SyntaxToken(TokensKind.Space, " ", null);
-            }
-
-            if (Current == '(')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.LeftBracket, "(", null);
-            }
-
-            else if (Current == ')')
-            {
-                NextPos();
-                return new SyntaxToken(TokensKind.RightBracket, ")", null);
             }
 
             return new SyntaxToken(TokensKind.Bad, null, null);

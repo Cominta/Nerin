@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Analyzers\Binder\Binder.cs" />
     <Compile Include="Analyzers\Binder\BinderItems.cs" />
+    <Compile Include="Analyzers\Binder\BinderOperators.cs" />
     <Compile Include="Evaulator.cs" />
     <Compile Include="Analyzers\Lexer.cs" />
     <Compile Include="Analyzers\Parser.cs" />

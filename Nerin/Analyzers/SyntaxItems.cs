@@ -14,6 +14,12 @@ namespace Nerin.Analyzers.Items
         End,
 
         Number,
+        OppositeBool,
+        And,
+        Or,
+        TrueValue,
+        FalseValue,
+        Variable,
 
         Plus,
         Minus,

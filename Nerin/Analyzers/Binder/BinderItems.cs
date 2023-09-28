@@ -38,21 +38,23 @@ namespace Nerin.Analyzers.Binder.Items
 
     public enum BoundUnaryOperatorKind
     {
-        Identity, // &&
-        Negation // !
+        Plus,
+        Minus, 
+
+        LogicalNegation // !
     }
 
     public class BoundUnaryExpr : BoundExpr
     {
-        public BoundUnaryOperatorKind OperatorKind { get; }
+        public BoundUnaryOperator Operator { get; }
         public BoundExpr Operand { get; }
         public override Type Type => Operand.Type;
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpr;
 
-        public BoundUnaryExpr(BoundUnaryOperatorKind _operator, BoundExpr operand) 
+        public BoundUnaryExpr(BoundUnaryOperator _operator, BoundExpr operand) 
         {
             Operand = operand;
-            OperatorKind = _operator;
+            Operator = _operator;
         }
     }
 
@@ -61,18 +63,21 @@ namespace Nerin.Analyzers.Binder.Items
         Addition,
         Substraction,
         Multiplication,
-        Division
+        Division,
+
+        LogicalAnd, // &&
+        LogicalOr // ||
     }
 
     class BoundBinaryExpr : BoundExpr
     {
         public BoundExpr Left { get; }
         public BoundExpr Right { get; }
-        public BoundBinaryOperatorKind Operator { get; }
+        public BoundBinaryOperator Operator { get; }
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpr;
-        public override Type Type => Left.GetType();
+        public override Type Type => Left.Type;
 
-        public BoundBinaryExpr(BoundExpr left, BoundExpr right, BoundBinaryOperatorKind _operator)
+        public BoundBinaryExpr(BoundExpr left, BoundExpr right, BoundBinaryOperator _operator)
         {
             Left = left;
             Right = right;

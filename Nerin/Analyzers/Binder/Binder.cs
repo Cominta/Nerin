@@ -32,18 +32,18 @@ namespace Nerin.Analyzers.Binder
         {
             BoundExpr left = Bind(expr.Left);
             BoundExpr right = Bind(expr.Right);
-            BoundBinaryOperatorKind? _operator = BindBinaryOperatorKind(expr.Operator.Kind, left.Type, right.Type);
+            BoundBinaryOperator _operator = BoundBinaryOperator.Bind(expr.Operator.Kind, left.Type, right.Type);
 
-            BoundBinaryExpr boundExpr = new BoundBinaryExpr(left, right, _operator.Value);
+            BoundBinaryExpr boundExpr = new BoundBinaryExpr(left, right, _operator);
             return boundExpr;
         }
 
         private BoundUnaryExpr BindUnaryExpr(UnaryExpr expr)
         {
             BoundExpr operand = Bind(expr.Expression);
-            BoundUnaryOperatorKind? _operator = BindUnaryOperatorKind(expr.Unary.Kind, operand.Type);
+            BoundUnaryOperator _operator = BoundUnaryOperator.Bind(expr.Unary.Kind, operand.Type);
 
-            BoundUnaryExpr boundExpr = new BoundUnaryExpr(_operator.Value, operand);
+            BoundUnaryExpr boundExpr = new BoundUnaryExpr(_operator, operand);
             return boundExpr;
         }
 
@@ -54,48 +54,75 @@ namespace Nerin.Analyzers.Binder
 
         private BoundUnaryOperatorKind? BindUnaryOperatorKind(TokensKind kind, Type type)
         {
-            if (type != typeof(int))
+            if (type == typeof(int))
             {
-                return null;
+                switch (kind)
+                {
+                    case TokensKind.Plus:
+                        return BoundUnaryOperatorKind.Plus;
+
+                    case TokensKind.Minus:
+                        return BoundUnaryOperatorKind.Minus;
+
+                    default:
+                        throw new Exception("In Binder.BindBinaryOperatorKind: Incorrect TokensKind kind");
+                }
             }
 
-            switch (kind)
+            else if (type == typeof(bool))
             {
-                case TokensKind.Plus:
-                    return BoundUnaryOperatorKind.Identity;
+                switch (kind)
+                {
+                    case TokensKind.OppositeBool:
+                        return BoundUnaryOperatorKind.LogicalNegation;
 
-                case TokensKind.Minus:
-                    return BoundUnaryOperatorKind.Negation;
-
-                default:
-                    throw new Exception("In Binder.BindBinaryOperatorKind: Incorrect TokensKind kind");
+                    default:
+                        throw new Exception("In Binder.BindBinaryOperatorKind: Incorrect TokensKind kind");
+                }
             }
+
+            return null;
         }
 
         private BoundBinaryOperatorKind? BindBinaryOperatorKind(TokensKind kind, Type leftType, Type rightType)
         {
-            //if (leftType != typeof(int) || rightType != typeof(int))
-            //{
-            //    return null;
-            //}
-
-            switch (kind)
+            if (leftType == typeof(int) && rightType == typeof(int))
             {
-                case TokensKind.Plus:
-                    return BoundBinaryOperatorKind.Addition; 
+                switch (kind)
+                {
+                    case TokensKind.Plus:
+                        return BoundBinaryOperatorKind.Addition; 
                 
-                case TokensKind.Minus:
-                    return BoundBinaryOperatorKind.Substraction;
+                    case TokensKind.Minus:
+                        return BoundBinaryOperatorKind.Substraction;
 
-                case TokensKind.Multi:
-                    return BoundBinaryOperatorKind.Multiplication;
+                    case TokensKind.Multi:
+                        return BoundBinaryOperatorKind.Multiplication;
 
-                case TokensKind.Divide:
-                    return BoundBinaryOperatorKind.Division;
+                    case TokensKind.Divide:
+                        return BoundBinaryOperatorKind.Division;
 
-                default:
-                    throw new Exception("In Binder.BindBinaryOperatorKind: Incorrect TokensKind kind");
+                    default:
+                        throw new Exception("In Binder.BindBinaryOperatorKind: Incorrect TokensKind kind");
+                }
             }
+
+            else if (leftType == typeof(bool) && rightType == typeof(bool))
+            {
+                switch (kind)
+                {
+                    case TokensKind.And:
+                        return BoundBinaryOperatorKind.LogicalAnd;
+
+                    case TokensKind.Or:
+                        return BoundBinaryOperatorKind.LogicalOr;
+
+                    default:
+                        throw new Exception("In Binder.BindBinaryOperatorKind: Incorrect TokensKind kind");
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -15,10 +15,16 @@ namespace Nerin.Analyzers
             {
                 case TokensKind.Multi:
                 case TokensKind.Divide:
-                    return 2;
+                    return 4;
 
                 case TokensKind.Plus:
                 case TokensKind.Minus:
+                    return 3;
+
+                case TokensKind.And:
+                    return 2;
+
+                case TokensKind.Or:
                     return 1;
 
                 default:
@@ -32,10 +38,25 @@ namespace Nerin.Analyzers
             {
                 case TokensKind.Plus:
                 case TokensKind.Minus:
-                    return 3;
+                case TokensKind.OppositeBool:
+                    return 5;
 
                 default:
                     return 0;
+            }
+        }
+        public static TokensKind GetKeywordKind(string word)
+        {
+            switch (word)
+            {
+                case "true":
+                    return TokensKind.TrueValue;
+
+                case "false":
+                    return TokensKind.FalseValue;
+
+                default:
+                    return TokensKind.Variable;
             }
         }
     }
