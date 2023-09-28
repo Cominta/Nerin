@@ -70,6 +70,12 @@ namespace Nerin
 
                     case BoundBinaryOperatorKind.LogicalOr:
                         return (bool)left || (bool)right;
+
+                    case BoundBinaryOperatorKind.LogicalEqual:
+                        return Equals(left, right);
+
+                    case BoundBinaryOperatorKind.LogicalNotEqual:
+                        return !Equals(left, right);
                 }
             }
 

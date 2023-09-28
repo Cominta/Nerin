@@ -17,6 +17,8 @@ namespace Nerin.Analyzers.Items
         OppositeBool,
         And,
         Or,
+        Equal,
+        NotEqual,
         TrueValue,
         FalseValue,
         Variable,

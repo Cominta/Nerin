@@ -22,7 +22,7 @@ namespace Nerin.Analyzers
                 return '\0';
             }
 
-            return text[pos];
+            return text[pos + offset];
         }
 
         public Lexer(string text)
@@ -114,15 +114,11 @@ namespace Nerin.Analyzers
                     NextPos();
                     return new SyntaxToken(TokensKind.RightBracket, ")", null);
 
-                case '!':
-                    NextPos();
-                    return new SyntaxToken(TokensKind.OppositeBool, "!", null);
-
                 case '&':
                     if (Peek(1) == '&')
                     {
                         pos += 2;
-                        return new SyntaxToken(TokensKind.And, "&", null);
+                        return new SyntaxToken(TokensKind.And, "&&", null);
                     }
                     break;
 
@@ -130,9 +126,27 @@ namespace Nerin.Analyzers
                     if (Peek(1) == '|')
                     {
                         pos += 2;
-                        return new SyntaxToken(TokensKind.Or, "|", null);
+                        return new SyntaxToken(TokensKind.Or, "||", null);
                     }
                     break;
+
+                case '=':
+                    if (Peek(1) == '=')
+                    {
+                        pos += 2;
+                        return new SyntaxToken(TokensKind.Equal, "==", null);
+                    }
+                    break;
+
+                case '!':
+                    if (Peek(1) == '=')
+                    {
+                        pos += 2;
+                        return new SyntaxToken(TokensKind.NotEqual, "!=", null);
+                    }
+
+                    NextPos();
+                    return new SyntaxToken(TokensKind.OppositeBool, "!", null);
             }
 
             if (Current == ' ')

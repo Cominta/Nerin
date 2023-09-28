@@ -72,6 +72,15 @@ namespace Nerin.Analyzers.Binder.Items
             ResultType = type;
         }
 
+        private BoundBinaryOperator(TokensKind kind, BoundBinaryOperatorKind boundKind, Type operandType, Type resultType)
+        {
+            Kind = kind;
+            BoundKind = boundKind;
+            LeftType = operandType;
+            RightType = operandType;
+            ResultType = resultType;
+        }
+
         private BoundBinaryOperator(TokensKind kind, BoundBinaryOperatorKind boundKind, Type leftType, Type rightType, Type resultType)
         {
             Kind = kind;
@@ -102,6 +111,18 @@ namespace Nerin.Analyzers.Binder.Items
             // ||
             new BoundBinaryOperator(TokensKind.Or, BoundBinaryOperatorKind.LogicalOr,
                                     typeof(bool)),
+            // == (bool)
+            new BoundBinaryOperator(TokensKind.Equal, BoundBinaryOperatorKind.LogicalEqual,
+                                    typeof(bool)),
+            // != (bool)
+            new BoundBinaryOperator(TokensKind.NotEqual, BoundBinaryOperatorKind.LogicalNotEqual,
+                                    typeof(bool)),
+            // == (int)
+            new BoundBinaryOperator(TokensKind.Equal, BoundBinaryOperatorKind.LogicalEqual,
+                                    typeof(int), typeof(bool)),
+            // != (int)
+            new BoundBinaryOperator(TokensKind.NotEqual, BoundBinaryOperatorKind.LogicalNotEqual,
+                                    typeof(int), typeof(bool)),
         };
 
         public static BoundBinaryOperator Bind(TokensKind kind, Type leftType, Type rightType)

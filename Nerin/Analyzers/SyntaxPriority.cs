@@ -15,10 +15,14 @@ namespace Nerin.Analyzers
             {
                 case TokensKind.Multi:
                 case TokensKind.Divide:
-                    return 4;
+                    return 5;
 
                 case TokensKind.Plus:
                 case TokensKind.Minus:
+                    return 4;
+
+                case TokensKind.Equal:
+                case TokensKind.NotEqual:
                     return 3;
 
                 case TokensKind.And:
@@ -39,7 +43,7 @@ namespace Nerin.Analyzers
                 case TokensKind.Plus:
                 case TokensKind.Minus:
                 case TokensKind.OppositeBool:
-                    return 5;
+                    return 6;
 
                 default:
                     return 0;

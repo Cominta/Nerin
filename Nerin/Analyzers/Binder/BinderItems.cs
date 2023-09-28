@@ -48,7 +48,7 @@ namespace Nerin.Analyzers.Binder.Items
     {
         public BoundUnaryOperator Operator { get; }
         public BoundExpr Operand { get; }
-        public override Type Type => Operand.Type;
+        public override Type Type => Operator.ResultType;
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpr;
 
         public BoundUnaryExpr(BoundUnaryOperator _operator, BoundExpr operand) 
@@ -66,7 +66,9 @@ namespace Nerin.Analyzers.Binder.Items
         Division,
 
         LogicalAnd, // &&
-        LogicalOr // ||
+        LogicalOr, // ||
+        LogicalEqual, // ==
+        LogicalNotEqual, // !=
     }
 
     class BoundBinaryExpr : BoundExpr
@@ -75,7 +77,7 @@ namespace Nerin.Analyzers.Binder.Items
         public BoundExpr Right { get; }
         public BoundBinaryOperator Operator { get; }
         public override BoundNodeKind Kind => BoundNodeKind.BinaryExpr;
-        public override Type Type => Left.Type;
+        public override Type Type => Operator.ResultType;
 
         public BoundBinaryExpr(BoundExpr left, BoundExpr right, BoundBinaryOperator _operator)
         {
