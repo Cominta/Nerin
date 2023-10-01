@@ -70,12 +70,12 @@ namespace Nerin.Analyzers
                 return new SyntaxToken(TokensKind.Number, numberStr, number);
             }
 
-            // 
+            // True, False, Variables
             else if (char.IsLetter(Current))
             {
                 int startIndex = pos;
 
-                while (char.IsLetter(Current))
+                while (char.IsLetter(Current) || char.IsDigit(Current))
                 {
                     NextPos();
                 }
@@ -83,7 +83,12 @@ namespace Nerin.Analyzers
                 string word = text.Substring(startIndex, pos - startIndex);
                 TokensKind kind = SyntaxPriority.GetKeywordKind(word);
 
-                return new SyntaxToken(kind, word, bool.Parse(word));
+                if (kind == TokensKind.TrueValue || kind == TokensKind.FalseValue)
+                {
+                    return new SyntaxToken(kind, word, bool.Parse(word));
+                }
+
+                return new SyntaxToken(kind, word, null);
             }
 
             // Operators
@@ -135,7 +140,9 @@ namespace Nerin.Analyzers
                         pos += 2;
                         return new SyntaxToken(TokensKind.Equal, "==", null);
                     }
-                    break;
+
+                    NextPos();
+                    return new SyntaxToken(TokensKind.Assigment, "=", null);
 
                 case '!':
                     if (Peek(1) == '=')

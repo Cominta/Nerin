@@ -11,10 +11,12 @@ namespace Nerin
     public class Evaulator
     {
         private BoundExpr root { get; }
+        Dictionary<string, object> Variables;
 
-        public Evaulator(BoundExpr root)
+        public Evaulator(BoundExpr root, Dictionary<string, object> variables)
         {
             this.root = root;
+            Variables = variables;
         }
 
         public object Evaluate()
@@ -27,6 +29,20 @@ namespace Nerin
             if (node.Kind == BoundNodeKind.LiteralExpr)
             {
                 return ((BoundLiteralExpr)node).Value;
+            }
+
+            if (node.Kind == BoundNodeKind.Variable)
+            {
+                object value = Variables[((BoundVariableExpr)node).Name];
+                return value;
+            }
+
+            if (node.Kind == BoundNodeKind.Assigment)
+            {
+                object value = Evaluate(((BoundAssigmentExpr)node).Expression);
+                Variables[((BoundAssigmentExpr)node).Name] = value;
+
+                return value;
             }
 
             if (node.Kind == BoundNodeKind.UnaryExpr)

@@ -11,7 +11,9 @@ namespace Nerin.Analyzers.Binder.Items
     {
         LiteralExpr,
         BinaryExpr,
-        UnaryExpr
+        UnaryExpr,
+        Variable,
+        Assigment
     }
 
     public abstract class BoundNode
@@ -22,6 +24,33 @@ namespace Nerin.Analyzers.Binder.Items
     public abstract class BoundExpr : BoundNode 
     {
         public abstract Type Type { get; }
+    }
+
+    public class BoundVariableExpr : BoundExpr
+    {
+        public string Name { get; }
+        public override Type Type { get; }
+        public override BoundNodeKind Kind => BoundNodeKind.Variable;
+
+        public BoundVariableExpr(string name, Type type)
+        {
+            Name = name;
+            Type = type;
+        }
+    }
+
+    public class BoundAssigmentExpr : BoundExpr
+    {
+        public override Type Type => Expression.Type;
+        public override BoundNodeKind Kind => BoundNodeKind.Assigment;
+        public string Name { get; }
+        public BoundExpr Expression { get; }
+
+        public BoundAssigmentExpr(string name, BoundExpr expr)
+        {
+            Name = name;
+            Expression = expr;
+        }
     }
 
     public class BoundLiteralExpr : BoundExpr

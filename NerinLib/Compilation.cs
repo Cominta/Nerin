@@ -25,12 +25,12 @@ namespace NerinLib
             Token = parserResult;
         }
 
-        public EvaluationResult EvaluateResult()
+        public EvaluationResult EvaluateResult(Dictionary<string, object> variables)
         {
-            Binder binder = new Binder();
+            Binder binder = new Binder(variables);
             BoundExpr expr = binder.Bind(Token);
 
-            Evaulator evaulator = new Evaulator(expr);
+            Evaulator evaulator = new Evaulator(expr, variables);
             return new EvaluationResult(evaulator.Evaluate());
         }
     }

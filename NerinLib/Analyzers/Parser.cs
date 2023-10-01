@@ -86,7 +86,34 @@ namespace Nerin.Analyzers
             }
         }
 
-        public Expr Parse(int parentPriority = 0)
+        public Expr Parse()
+        {
+            Expr expr = ParseExpr();
+            return expr;
+        }
+
+        private Expr ParseExpr()
+        {
+            return ParseAssigment();
+        }
+
+        private Expr ParseAssigment()
+        {
+            if (Current.Kind == TokensKind.Name && 
+                Peek(1).Kind == TokensKind.Assigment)
+            {
+                SyntaxToken variable = NextToken();
+                SyntaxToken assigmentToken = NextToken();
+                Expr assigmentExpr = ParseAssigment();
+                
+                return new AssigmentExpr(variable, assigmentToken, assigmentExpr);
+            }
+
+            Expr left = ParseBinary();
+            return left;
+        }
+
+        public Expr ParseBinary(int parentPriority = 0)
         {
             Expr left;
             int unaryPriority = Current.Kind.GetUnaryOperatorPriority();
@@ -94,7 +121,7 @@ namespace Nerin.Analyzers
             if (unaryPriority != 0 && unaryPriority >= parentPriority)
             {
                 SyntaxToken _operator = NextToken();
-                Expr operand = Parse(unaryPriority);
+                Expr operand = ParseBinary(unaryPriority);
 
                 left = new UnaryExpr(operand, _operator);
             }
@@ -115,7 +142,7 @@ namespace Nerin.Analyzers
                 }
 
                 SyntaxToken _operator = NextToken();
-                Expr right = Parse(priority);
+                Expr right = ParseBinary(priority);
 
                 left = new BinaryExpr(left, right, _operator);
             }
@@ -138,6 +165,17 @@ namespace Nerin.Analyzers
                      Current.Kind == TokensKind.FalseValue)
             {
                 return new LiteralExpr(NextToken());
+            }
+
+            else if (Current.Kind == TokensKind.Name)
+            {
+                SyntaxToken variable = NextToken();
+                if (Current.Kind == TokensKind.Assigment)
+                {
+                    SyntaxToken assigment = NextToken();
+
+                }
+                return new NameExpr(variable);
             }
 
             SyntaxToken number = Match(TokensKind.Number);

@@ -49,18 +49,19 @@ namespace Nerin.Analyzers
                     return 0;
             }
         }
+
         public static TokensKind GetKeywordKind(string word)
         {
             switch (word)
             {
-                case "true":
+                case "True":
                     return TokensKind.TrueValue;
 
-                case "false":
+                case "False":
                     return TokensKind.FalseValue;
 
                 default:
-                    return TokensKind.Variable;
+                    return TokensKind.Name;
             }
         }
     }

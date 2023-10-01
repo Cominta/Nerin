@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,7 +22,8 @@ namespace Nerin.Analyzers.Items
         NotEqual,
         TrueValue,
         FalseValue,
-        Variable,
+        Name,
+        Assigment,
 
         Plus,
         Minus,
@@ -82,6 +84,44 @@ namespace Nerin.Analyzers.Items
             yield return Left;
             yield return Operator;
             yield return Right;
+        }
+    }
+
+    class NameExpr : Expr
+    {
+        public SyntaxToken Token { get; }
+        public override TokensKind Kind => TokensKind.Name;
+
+        public NameExpr(SyntaxToken token)
+        {
+            Token = token;
+        }
+
+        public override IEnumerable<object> GetChild()
+        {
+            yield return Token;
+        }
+    }
+
+    class AssigmentExpr : Expr
+    {
+        public SyntaxToken Token { get; }
+        public Expr Expression { get; }
+        public SyntaxToken EqualsToken { get; }
+        public override TokensKind Kind => TokensKind.Assigment;
+
+        public AssigmentExpr(SyntaxToken token, SyntaxToken equalsToken, Expr expr)
+        {
+            Token = token;
+            EqualsToken = equalsToken;
+            Expression = expr;
+        }
+
+        public override IEnumerable<object> GetChild()
+        {
+            yield return Token;
+            yield return EqualsToken;
+            yield return Expression;
         }
     }
 

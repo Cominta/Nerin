@@ -22,6 +22,7 @@ namespace Nerin
 
             string currentStr = "";
             Parser parser = new Parser();
+            Dictionary<string, object> variables = new Dictionary<string, object>();
 
             while (true)
             {
@@ -29,7 +30,7 @@ namespace Nerin
                 currentStr = Console.ReadLine();
 
                 Compilation compilation = new Compilation(currentStr);
-                EvaluationResult resultBound = compilation.EvaluateResult();
+                EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
                 ConsoleColor color = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.DarkCyan;

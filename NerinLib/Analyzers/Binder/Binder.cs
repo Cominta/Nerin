@@ -10,6 +10,13 @@ namespace Nerin.Analyzers.Binder
 {
     public class Binder
     {
+        private Dictionary<string, object> Variables;
+
+        public Binder(Dictionary<string, object> variables) 
+        {
+            Variables = variables;
+        }
+
         public BoundExpr Bind(Expr expr)
         {
             switch (expr.Kind)
@@ -23,9 +30,36 @@ namespace Nerin.Analyzers.Binder
                 case TokensKind.BinaryExpr:
                     return BindBinaryExpr((BinaryExpr)expr);
 
+                case TokensKind.BracketsExpr:
+                    return BindBrackets((BracketsExpr)expr);
+
+                case TokensKind.Name:
+                    return BindName((NameExpr)expr);
+
+                case TokensKind.Assigment:
+                    return BindAssigment((AssigmentExpr)expr);
+
                 default:
                     throw new Exception("In Binder.Bind: Incorrect Expr");
             }
+        }
+
+        private BoundExpr BindBrackets(BracketsExpr expr)
+        {
+            return Bind(expr.Expression);
+        }
+
+        private BoundExpr BindName(NameExpr expr)
+        {
+            return new BoundVariableExpr(expr.Token.Text, Variables[expr.Token.Text].GetType());
+        }
+
+        private BoundExpr BindAssigment(AssigmentExpr expr)
+        {
+            BoundExpr exprToAssigment = Bind(expr.Expression);
+            string name = expr.Token.Text;
+
+            return new BoundAssigmentExpr(name, exprToAssigment);
         }
 
         private BoundBinaryExpr BindBinaryExpr(BinaryExpr expr) 
