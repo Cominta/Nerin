@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E15BD9A8-1CE5-4D09-B019-FF7C11BB4D40}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Nerin</RootNamespace>
-    <AssemblyName>Nerin</AssemblyName>
+    <ProjectGuid>{8F2EF334-DA56-40B3-ADBE-AB34025D7CD2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NerinLib</RootNamespace>
+    <AssemblyName>NerinLib</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,8 +33,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,26 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NiDE\NerinMain.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NiDE\NerinMain.Designer.cs">
-      <DependentUpon>NerinMain.cs</DependentUpon>
-    </Compile>
-    <Compile Include="NiDE\NideConsole.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Analyzers\Binder\Binder.cs" />
+    <Compile Include="Analyzers\Binder\BinderItems.cs" />
+    <Compile Include="Analyzers\Binder\BinderOperators.cs" />
+    <Compile Include="Analyzers\Lexer.cs" />
+    <Compile Include="Analyzers\Parser.cs" />
+    <Compile Include="Analyzers\SyntaxItems.cs" />
+    <Compile Include="Analyzers\SyntaxPriority.cs" />
+    <Compile Include="Compilation.cs" />
+    <Compile Include="Evaulator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NerinLib\NerinLib.csproj">
-      <Project>{8f2ef334-da56-40b3-adbe-ab34025d7cd2}</Project>
-      <Name>NerinLib</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

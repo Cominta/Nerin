@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NerinLib;
 
 namespace Nerin
 {
@@ -21,31 +22,24 @@ namespace Nerin
 
             string currentStr = "";
             Parser parser = new Parser();
-            Binder binder = new Binder();
 
             while (true)
             {
                 Console.Write("> ");
                 currentStr = Console.ReadLine();
 
-                Expr resultParse = null;
-                BoundExpr resultBound = null;
-
-                parser.SetText(currentStr);
-                resultParse = parser.Parse();
-                resultBound = binder.Bind(resultParse);
-                
-                Evaulator evaulator = new Evaulator(resultBound);
+                Compilation compilation = new Compilation(currentStr);
+                EvaluationResult resultBound = compilation.EvaluateResult();
 
                 ConsoleColor color = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
 
                 bool errors = false;
-                Print("  ", resultParse, ref errors);
+                Print("  ", compilation.Token, ref errors);
 
                 if (!errors)
                 {
-                    Console.WriteLine($"Result = {evaulator.Evaluate()}");
+                    Console.WriteLine($"Result = {resultBound.Value}");
                 }
 
                 Console.ForegroundColor = color;
