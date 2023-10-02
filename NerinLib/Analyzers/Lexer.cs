@@ -1,6 +1,7 @@
 ﻿using Nerin.Analyzers.Items;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,12 @@ namespace Nerin.Analyzers
     {
         private string text;
         private int pos;
+
+        private int start;
+        private TokensKind kind;
+        private object value;
+        private string symbols;
+
         private char Current => Peek(0);
 
         private char Peek(int offset)
@@ -47,82 +54,62 @@ namespace Nerin.Analyzers
 
         public SyntaxToken NextToken()
         {
-            // End
-            if (pos >= text.Length)
-            {
-                return new SyntaxToken(TokensKind.End, "\0", null);
-            }
-
-            // Number
-            else if (char.IsDigit(Current))
-            {
-                int startIndex = pos;
-
-                while (char.IsDigit(Current))
-                {
-                    NextPos();
-                }
-
-                int number = 0;
-                string numberStr = text.Substring(startIndex, pos - startIndex);
-                int.TryParse(numberStr, out number);
-
-                return new SyntaxToken(TokensKind.Number, numberStr, number);
-            }
-
-            // True, False, Variables
-            else if (char.IsLetter(Current))
-            {
-                int startIndex = pos;
-
-                while (char.IsLetter(Current) || char.IsDigit(Current))
-                {
-                    NextPos();
-                }
-
-                string word = text.Substring(startIndex, pos - startIndex);
-                TokensKind kind = SyntaxPriority.GetKeywordKind(word);
-
-                if (kind == TokensKind.TrueValue || kind == TokensKind.FalseValue)
-                {
-                    return new SyntaxToken(kind, word, bool.Parse(word));
-                }
-
-                return new SyntaxToken(kind, word, null);
-            }
+            start = pos;
+            kind = TokensKind.Bad;
+            value = null;
+            symbols = null;
 
             // Operators
             switch (Current)
             {
+                case '\0':
+                    kind = TokensKind.End;
+                    symbols = "\0";
+                    value = null;
+                    break;
+
                 case '+':
                     NextPos();
-                    return new SyntaxToken(TokensKind.Plus, "+", null);
+                    kind = TokensKind.Plus;
+                    value = null;
+                    break;
 
                 case '-':
                     NextPos();
-                    return new SyntaxToken(TokensKind.Minus, "-", null);
+                    kind = TokensKind.Minus;
+                    value = null;
+                    break;
 
                 case '*':
                     NextPos();
-                    return new SyntaxToken(TokensKind.Multi, "*", null);
+                    kind = TokensKind.Multi;
+                    value = null;
+                    break;
 
                 case '/':
                     NextPos();
-                    return new SyntaxToken(TokensKind.Divide, "/", null);
+                    kind = TokensKind.Divide;
+                    value = null;
+                    break;
 
                 case '(':
                     NextPos();
-                    return new SyntaxToken(TokensKind.LeftBracket, "(", null);
+                    kind = TokensKind.LeftBracket;
+                    value = null;
+                    break;
 
                 case ')':
                     NextPos();
-                    return new SyntaxToken(TokensKind.RightBracket, ")", null);
+                    kind = TokensKind.RightBracket;
+                    value = null;
+                    break;
 
                 case '&':
                     if (Peek(1) == '&')
                     {
                         pos += 2;
-                        return new SyntaxToken(TokensKind.And, "&&", null);
+                        kind = TokensKind.And;
+                        value = null;
                     }
                     break;
 
@@ -130,7 +117,8 @@ namespace Nerin.Analyzers
                     if (Peek(1) == '|')
                     {
                         pos += 2;
-                        return new SyntaxToken(TokensKind.Or, "||", null);
+                        kind = TokensKind.Or;
+                        value = null;
                     }
                     break;
 
@@ -138,30 +126,113 @@ namespace Nerin.Analyzers
                     if (Peek(1) == '=')
                     {
                         pos += 2;
-                        return new SyntaxToken(TokensKind.Equal, "==", null);
+                        kind = TokensKind.Equal;
+                        value = null;
                     }
 
-                    NextPos();
-                    return new SyntaxToken(TokensKind.Assigment, "=", null);
+                    else
+                    {
+                        NextPos();
+                        kind = TokensKind.Assigment;
+                        value = null;
+                    }
+
+                    break;
 
                 case '!':
                     if (Peek(1) == '=')
                     {
                         pos += 2;
-                        return new SyntaxToken(TokensKind.NotEqual, "!=", null);
+                        kind = TokensKind.NotEqual; 
+                        value = null;
                     }
 
-                    NextPos();
-                    return new SyntaxToken(TokensKind.OppositeBool, "!", null);
+                    else
+                    {
+                        NextPos();
+                        kind = TokensKind.OppositeBool;
+                        value = null;
+                    }
+
+                    break;
+
+                default:
+                    // Number
+                    if (char.IsDigit(Current))
+                    {
+                        LexDigit();
+                    }
+
+                    // True, False, Variables
+                    else if (char.IsLetter(Current))
+                    {
+                        LexLetters();
+                    }
+
+                    else if (char.IsWhiteSpace(Current))
+                    {
+                        LexWhiteSpace();
+                    }
+
+                    else
+                    {
+                        kind = TokensKind.Bad;
+                        value = null;
+                    }
+
+                    break;
             }
 
-            if (Current == ' ')
+            symbols = text.Substring(start, pos - start);
+
+            return new SyntaxToken(kind, symbols, value);
+        }
+
+        private void LexDigit()
+        {
+            while (char.IsDigit(Current))
             {
                 NextPos();
-                return new SyntaxToken(TokensKind.Space, " ", null);
             }
 
-            return new SyntaxToken(TokensKind.Bad, null, null);
+            int number = 0;
+            string numberStr = text.Substring(start, pos - start);
+            int.TryParse(numberStr, out number);
+
+            value = number;
+            symbols = numberStr;
+            kind = TokensKind.Number;
+        }
+
+        private void LexWhiteSpace()
+        {
+            while (char.IsWhiteSpace(Current))
+            {
+                NextPos();
+            }
+
+            kind = TokensKind.Space;
+            value = null;
+            symbols = " ";
+        }
+
+        private void LexLetters()
+        {
+            while (char.IsLetter(Current) || char.IsDigit(Current))
+            {
+                NextPos();
+            }
+
+            string word = text.Substring(start, pos - start);
+            kind = SyntaxPriority.GetKeywordKind(word);
+            value = null;
+
+            if (kind == TokensKind.TrueValue || kind == TokensKind.FalseValue)
+            {
+                value = bool.Parse(word);
+            }
+
+            symbols = word;
         }
     }
 }
