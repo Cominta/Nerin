@@ -17,6 +17,7 @@ namespace Nerin.NerinIDE
     {
         private TextBox MainWindow;
         private Button Compile;
+        private Button SettingsButton;
         private string _inputText;
         private bool error = false;
 
@@ -36,22 +37,33 @@ namespace Nerin.NerinIDE
 
             Compile = new Button();
             Compile.Text = "Compile";
+
+            // Button position
             Compile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             Compile.Margin = new Padding(10);
-            Compile.Location = new Point(panel.ClientSize.Width - Compile.Width - 50, 10); // Button position
-            Compile.Click += Compile_Click;
+            Compile.Location = new Point(panel.ClientSize.Width - Compile.Width - 50, 10);
 
             //Add events
+            Compile.Click += Compile_Click;
             Compile.MouseEnter += Compile_MouseEnter;
             Compile.MouseLeave += Compile_MouseLeave;
 
             panel.BorderStyle = BorderStyle.FixedSingle;
             panel.Controls.Add(Compile);
-            panel.BackColor = Color.FromArgb(38, 38, 38); //Panel color
+            panel.BackColor = Color.FromArgb(38, 38, 38);
 
             //Button colors
             Compile.BackColor = Color.FromArgb(67, 67, 67);
             Compile.ForeColor = Color.FromArgb(255, 255, 255);
+
+            //Settings
+            SettingsButton = new Button();
+            SettingsButton.Text = "Settings";
+            SettingsButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            SettingsButton.Margin = new Padding(10);
+            SettingsButton.Location = new Point(SettingsButton.Width - 50, 10);
+            SettingsButton.Click += SettingsButton_Click;
+            panel.Controls.Add(SettingsButton);
 
             //Main window - only for text
             MainWindow = new TextBox();
@@ -99,6 +111,11 @@ namespace Nerin.NerinIDE
             {
                 ShowConsole();
             }
+        }
+
+        private void SettingsButton_Click(object sender, EventArgs e)
+        {
+            ShowSettingsDialog();
         }
 
         private void ShowConsole()
