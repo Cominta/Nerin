@@ -1,5 +1,6 @@
 ﻿using Nerin.Analyzers;
 using Nerin.Analyzers.Binder.Items;
+using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace Nerin
     public class Evaulator
     {
         private BoundExpr root { get; }
-        Dictionary<string, object> Variables;
+        Dictionary<VariableSymbol, object> Variables;
 
-        public Evaulator(BoundExpr root, Dictionary<string, object> variables)
+        public Evaulator(BoundExpr root, Dictionary<VariableSymbol, object> variables)
         {
             this.root = root;
             Variables = variables;
@@ -60,13 +61,13 @@ namespace Nerin
 
         private object EvaluateVariable(BoundVariableExpr node)
         {
-            return Variables[node.Name];
+            return Variables[node.VarSymbol];
         }
 
         private object EvaluateAssigment(BoundAssigmentExpr node)
         {
             object value = Evaluate(node.Expression);
-            Variables[node.Name] = value;
+            Variables[node.Var] = value;
 
             return value;
         }

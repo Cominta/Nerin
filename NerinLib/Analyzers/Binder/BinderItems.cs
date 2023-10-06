@@ -1,7 +1,9 @@
 ﻿using Nerin.Analyzers.Items;
+using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,14 +30,13 @@ namespace Nerin.Analyzers.Binder.Items
 
     public class BoundVariableExpr : BoundExpr
     {
-        public string Name { get; }
-        public override Type Type { get; }
+        public VariableSymbol VarSymbol { get; }
+        public override Type Type => VarSymbol.Type;
         public override BoundNodeKind Kind => BoundNodeKind.Variable;
 
-        public BoundVariableExpr(string name, Type type)
+        public BoundVariableExpr(VariableSymbol var)
         {
-            Name = name;
-            Type = type;
+            VarSymbol = var;
         }
     }
 
@@ -43,12 +44,12 @@ namespace Nerin.Analyzers.Binder.Items
     {
         public override Type Type => Expression.Type;
         public override BoundNodeKind Kind => BoundNodeKind.Assigment;
-        public string Name { get; }
+        public VariableSymbol Var { get; }
         public BoundExpr Expression { get; }
 
-        public BoundAssigmentExpr(string name, BoundExpr expr)
+        public BoundAssigmentExpr(VariableSymbol var, BoundExpr expr)
         {
-            Name = name;
+            Var = var;
             Expression = expr;
         }
     }

@@ -36,7 +36,9 @@ namespace Nerin.Analyzers.Items
         BinaryExpr,
         BracketsExpr,
         LiteralExpr,
-        UnaryExpr
+        UnaryExpr,
+
+        CompilationUnit
     }
 
     // Low-level token

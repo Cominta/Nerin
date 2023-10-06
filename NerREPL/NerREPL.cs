@@ -1,6 +1,8 @@
 ﻿using Nerin.Analyzers;
 using Nerin.Analyzers.Items;
 using NerinLib;
+using NerinLib.Analyzers;
+using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,25 +17,28 @@ namespace NerREPL
         {
             string currentStr = "";
             Parser parser = new Parser();
-            Dictionary<string, object> variables = new Dictionary<string, object>();
+            Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
+            Compilation previous = null;
 
             while (true)
             {
                 Console.Write("> ");
                 currentStr = Console.ReadLine();
 
-                Compilation compilation = new Compilation(currentStr);
+                SyntaxTree tree = SyntaxTree.Parse(currentStr);
+                Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                 EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
                 ConsoleColor color = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
 
                 bool errors = false;
-                Print("  ", compilation.Token, ref errors);
+                Print("  ", compilation.Tree.Root, ref errors);
 
                 if (!errors)
                 {
                     Console.WriteLine($"Result = {resultBound.Value}");
+                    previous = compilation;
                 }
 
                 Console.ForegroundColor = color;
