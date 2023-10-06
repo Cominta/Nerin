@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nerin", "Nerin\Nerin.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NerinLib", "NerinLib\NerinLib.csproj", "{8F2EF334-DA56-40B3-ADBE-AB34025D7CD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NerREPL", "NerREPL\NerREPL.csproj", "{368C5A6E-AA5C-40D9-9B28-816A735C9D27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8F2EF334-DA56-40B3-ADBE-AB34025D7CD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F2EF334-DA56-40B3-ADBE-AB34025D7CD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F2EF334-DA56-40B3-ADBE-AB34025D7CD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{368C5A6E-AA5C-40D9-9B28-816A735C9D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{368C5A6E-AA5C-40D9-9B28-816A735C9D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{368C5A6E-AA5C-40D9-9B28-816A735C9D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{368C5A6E-AA5C-40D9-9B28-816A735C9D27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

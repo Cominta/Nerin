@@ -26,81 +26,103 @@ namespace Nerin
 
         private object Evaluate(BoundExpr node)
         {
-            if (node.Kind == BoundNodeKind.LiteralExpr)
+            switch (node.Kind)
             {
-                return ((BoundLiteralExpr)node).Value;
-            }
+                case BoundNodeKind.LiteralExpr:
+                    return EvaluateLiteral((BoundLiteralExpr)node);
 
-            if (node.Kind == BoundNodeKind.Variable)
-            {
-                object value = Variables[((BoundVariableExpr)node).Name];
-                return value;
-            }
+                case BoundNodeKind.Variable:
+                    return EvaluateVariable((BoundVariableExpr)node);
 
-            if (node.Kind == BoundNodeKind.Assigment)
-            {
-                object value = Evaluate(((BoundAssigmentExpr)node).Expression);
-                Variables[((BoundAssigmentExpr)node).Name] = value;
+                case BoundNodeKind.Assigment:
+                    return EvaluateAssigment((BoundAssigmentExpr)node);
 
-                return value;
-            }
+                case BoundNodeKind.UnaryExpr:
+                    return EvaluateUnaryExpr((BoundUnaryExpr)node);
 
-            if (node.Kind == BoundNodeKind.UnaryExpr)
-            {
-                object result = Evaluate(((BoundUnaryExpr)node).Operand);
-                
-                switch (((BoundUnaryExpr)node).Operator.BoundKind)
-                {
-                    case BoundUnaryOperatorKind.Plus:
-                        return (int)result;
+                case BoundNodeKind.BinaryExpr:
+                    return EvaluateBinaryExpr((BoundBinaryExpr)node);
 
-                    case BoundUnaryOperatorKind.Minus: 
-                        return -(int)result;
-
-                    case BoundUnaryOperatorKind.LogicalNegation: 
-                        return !(bool)(result);
-                }
-            }
-
-            if (node.Kind == BoundNodeKind.BinaryExpr)
-            {
-                object left = Evaluate(((BoundBinaryExpr)node).Left);
-                object right = Evaluate(((BoundBinaryExpr)node).Right);
-
-                switch (((BoundBinaryExpr)node).Operator.BoundKind)
-                {
-                    case BoundBinaryOperatorKind.Addition:
-                        return (int)left + (int)right;
-
-                    case BoundBinaryOperatorKind.Substraction:
-                        return (int)left - (int)right;
-
-                    case BoundBinaryOperatorKind.Multiplication:
-                        return (int)left * (int)right;
-
-                    case BoundBinaryOperatorKind.Division:
-                        return (int)left / (int)right;
-
-                    case BoundBinaryOperatorKind.LogicalAnd:
-                        return (bool)left && (bool)right;
-
-                    case BoundBinaryOperatorKind.LogicalOr:
-                        return (bool)left || (bool)right;
-
-                    case BoundBinaryOperatorKind.LogicalEqual:
-                        return Equals(left, right);
-
-                    case BoundBinaryOperatorKind.LogicalNotEqual:
-                        return !Equals(left, right);
-                }
+                default:
+                    throw new Exception("Failed to evaluate");
             }
 
             //if (node.Kind == BoundNodeKind.BracketsExpr)
             //{
             //    return Evaluate(((BracketsExpr)node).Expression);
             //}
+        }
 
-            throw new Exception("Failed to evaluate");
+        private object EvaluateLiteral(BoundLiteralExpr node)
+        {
+            return node.Value;
+        }
+
+        private object EvaluateVariable(BoundVariableExpr node)
+        {
+            return Variables[node.Name];
+        }
+
+        private object EvaluateAssigment(BoundAssigmentExpr node)
+        {
+            object value = Evaluate(node.Expression);
+            Variables[node.Name] = value;
+
+            return value;
+        }
+
+        private object EvaluateUnaryExpr(BoundUnaryExpr node)
+        {
+            object result = Evaluate(((BoundUnaryExpr)node).Operand);
+
+            switch (((BoundUnaryExpr)node).Operator.BoundKind)
+            {
+                case BoundUnaryOperatorKind.Plus:
+                    return (int)result;
+
+                case BoundUnaryOperatorKind.Minus:
+                    return -(int)result;
+
+                case BoundUnaryOperatorKind.LogicalNegation:
+                    return !(bool)(result);
+            }
+
+            throw new Exception();
+        }
+
+        private object EvaluateBinaryExpr(BoundBinaryExpr node) 
+        {
+            object left = Evaluate(((BoundBinaryExpr)node).Left);
+            object right = Evaluate(((BoundBinaryExpr)node).Right);
+
+            switch (((BoundBinaryExpr)node).Operator.BoundKind)
+            {
+                case BoundBinaryOperatorKind.Addition:
+                    return (int)left + (int)right;
+
+                case BoundBinaryOperatorKind.Substraction:
+                    return (int)left - (int)right;
+
+                case BoundBinaryOperatorKind.Multiplication:
+                    return (int)left * (int)right;
+
+                case BoundBinaryOperatorKind.Division:
+                    return (int)left / (int)right;
+
+                case BoundBinaryOperatorKind.LogicalAnd:
+                    return (bool)left && (bool)right;
+
+                case BoundBinaryOperatorKind.LogicalOr:
+                    return (bool)left || (bool)right;
+
+                case BoundBinaryOperatorKind.LogicalEqual:
+                    return Equals(left, right);
+
+                case BoundBinaryOperatorKind.LogicalNotEqual:
+                    return !Equals(left, right);
+            }
+
+            throw new Exception();
         }
     }
 }
