@@ -2,14 +2,11 @@
 using Nerin.Analyzers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using NerinLib;
+using System.Text;
+using System.Runtime.InteropServices;
 
 namespace Nerin.NerinIDE
 {
@@ -17,8 +14,8 @@ namespace Nerin.NerinIDE
     {
         private TextBox MainWindow;
         private Button Compile;
-        private Button SettingsButton;
-        private string _inputText;
+        private Button Settings;
+        private string _inputText = "";
         private bool error = false;
 
         public string GetText()
@@ -26,67 +23,71 @@ namespace Nerin.NerinIDE
             return _inputText;
         }
 
-        //Main window settings
         public NideMain()
         {
             InitializeComponent();
+            InitializeLayout();
+            InitializeEventHandlers();
+        }
 
-            Panel panel = new Panel();
-            panel.Dock = DockStyle.Fill;
-            this.Controls.Add(panel);
+        private void InitializeLayout()
+        {
+            TableLayoutPanel mainTable = new TableLayoutPanel();
+            mainTable.Dock = DockStyle.Fill;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.Padding = new Padding(0);
+            this.Controls.Add(mainTable);
 
-            Compile = new Button();
-            Compile.Text = "Compile";
+            mainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+            Panel topPanel = new Panel();
+            topPanel.Dock = DockStyle.Fill;
+            mainTable.Controls.Add(topPanel, 0, 0);
 
-            // Button position
-            Compile.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Compile.Margin = new Padding(10);
-            Compile.Location = new Point(panel.ClientSize.Width - Compile.Width - 50, 10);
+            mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            TextBox mainTextBox = new TextBox();
+            mainTextBox.Multiline = true;
+            mainTextBox.ScrollBars = ScrollBars.Both;
+            mainTextBox.Dock = DockStyle.Fill;
+            mainTable.Controls.Add(mainTextBox, 0, 1);
 
-            //Add events
+            MainWindow = mainTextBox;
+
+            Compile = CreateButton("Compile", AnchorStyles.Top | AnchorStyles.Right, topPanel.Width / 2, 5);
+            Settings = CreateButton("Settings", AnchorStyles.Top | AnchorStyles.Right, topPanel.Width / 10, 5);
+            topPanel.Controls.Add(Compile);
+            topPanel.Controls.Add(Settings);
+
+
+            topPanel.BorderStyle = BorderStyle.FixedSingle;
+            topPanel.BackColor = Color.FromArgb(38, 38, 38);
+            mainTextBox.BackColor = Color.FromArgb(67, 67, 67);
+            mainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
+        }
+
+        private Button CreateButton(string text, AnchorStyles anchor, int x, int y)
+        {
+            Button button = new Button();
+            button.Text = text;
+            button.Location = new Point(x, y);
+            button.Anchor = anchor;
+            button.Margin = new Padding(10);
+            return button;
+        }
+
+        private void InitializeEventHandlers()
+        {
             Compile.Click += Compile_Click;
             Compile.MouseEnter += Compile_MouseEnter;
             Compile.MouseLeave += Compile_MouseLeave;
 
-            panel.BorderStyle = BorderStyle.FixedSingle;
-            panel.Controls.Add(Compile);
-            panel.BackColor = Color.FromArgb(38, 38, 38);
-
-            //Button colors
-            Compile.BackColor = Color.FromArgb(67, 67, 67);
-            Compile.ForeColor = Color.FromArgb(255, 255, 255);
-
-            //Settings
-            SettingsButton = new Button();
-            SettingsButton.Text = "Settings";
-            SettingsButton.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            SettingsButton.Margin = new Padding(10);
-            SettingsButton.Location = new Point(SettingsButton.Width - 50, 10);
-            SettingsButton.Click += SettingsButton_Click;
-            panel.Controls.Add(SettingsButton);
-
-            //Main window - only for text
-            MainWindow = new TextBox();
-            MainWindow.Multiline = true;
-            MainWindow.Dock = DockStyle.Bottom;
-            MainWindow.ScrollBars = ScrollBars.Both;
+            Settings.Click += SettingsButton_Click;
             MainWindow.TextChanged += Console_TextChanged;
             MainWindow.TextChanged += MainWindow_TextChanged;
-            MainWindow.BorderStyle = BorderStyle.FixedSingle;
-
-            //Main window colors
-            MainWindow.BackColor = Color.FromArgb(67, 67, 67);
-            MainWindow.ForeColor = Color.FromArgb(255, 255, 255);
-
-            MainWindow.Height = ClientSize.Height - 40;
-
-            panel.Controls.Add(MainWindow);
 
             this.KeyPreview = true;
             this.KeyDown += NideMain_KeyDown;
         }
 
-        // Ctrl + F5 checkout
         private void NideMain_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.F5 && !error)
@@ -99,13 +100,11 @@ namespace Nerin.NerinIDE
             }
         }
 
-        //Button checkout
         private void Compile_Click(object sender, EventArgs e)
         {
             if (error)
             {
                 MessageBox.Show("The program cannot be compiled because the code contains errors", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
             }
             else
             {
@@ -127,7 +126,6 @@ namespace Nerin.NerinIDE
 
             foreach (string line in lines)
             {
-                // Show result in console for each line
                 Compilation compilation = new Compilation(line);
                 EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
@@ -149,13 +147,14 @@ namespace Nerin.NerinIDE
             Compile.BackColor = Color.FromArgb(67, 67, 67); // start color
         }
 
-        // Save text to _inputText
         private void Console_TextChanged(object sender, EventArgs e)
         {
-            _inputText = MainWindow.Text;
+            if (MainWindow != null)
+            {
+                _inputText = MainWindow.Text;
+            }
         }
 
-        //Text color change
         private void MainWindow_TextChanged(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(MainWindow.Text))
