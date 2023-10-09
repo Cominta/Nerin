@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -42,11 +43,11 @@ namespace Nerin.NerinIDE
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 588);
+            this.ClientSize = new System.Drawing.Size(966, 588);
             this.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            //this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "NideMain";
             this.Text = "NiDE";
             this.ResumeLayout(false);
@@ -55,6 +56,7 @@ namespace Nerin.NerinIDE
 
         private void SetConsole(StringBuilder resultBuilder)
         {
+            //To receive data from NideMain class 
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NideMain));
 
             Form ConsoleWindow = new Form();
@@ -80,7 +82,7 @@ namespace Nerin.NerinIDE
             ConsoleWindow.ShowDialog();
         }
 
-        private void ShowSettingsDialog()
+        private void ShowSettings()
         {
             Form Settings = new Form();
             Settings.Text = "Settings";
@@ -129,7 +131,7 @@ namespace Nerin.NerinIDE
             Apply.Location = new Point(100, 150);
             Apply.Click += (s, e) =>
             {
-                if (float.TryParse(Font.Text, out float fontSize))
+                if (float.TryParse(Font.Value.ToString(), out float fontSize))
                 {
                     MainWindow.Font = new Font(MainWindow.Font.FontFamily, fontSize);
                 }
@@ -138,6 +140,9 @@ namespace Nerin.NerinIDE
                 this.Height = (int)HeightNumericUpDown.Value;
                 Settings.Close();
             };
+
+            Apply.MouseEnter += Apply_MouseEnter;
+            Apply.MouseLeave += Apply_MouseLeave;
 
             Settings.Controls.Add(FontLabel);
             Settings.Controls.Add(Font);
@@ -148,6 +153,25 @@ namespace Nerin.NerinIDE
             Settings.Controls.Add(Apply);
 
             Settings.ShowDialog();
+        }
+
+        public delegate void EventHandler(object sender, EventArgs e);
+
+
+        private void Apply_MouseEnter(object sender, EventArgs e)
+        {
+            if (sender is Button applyButton)
+            {
+                applyButton.BackColor = Color.FromArgb(100, 100, 100);
+            }
+        }
+
+        private void Apply_MouseLeave(object sender, EventArgs e)
+        {
+            if (sender is Button applyButton)
+            {
+                applyButton.BackColor = Color.Gray;
+            }
         }
 
         #endregion
