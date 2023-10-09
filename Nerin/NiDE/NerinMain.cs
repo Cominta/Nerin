@@ -54,8 +54,8 @@ namespace Nerin.NerinIDE
 
             MainWindow = mainTextBox;
 
-            Compile = CreateButton("Compile", null, Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 100, 10);
-            Settings = CreateButton("Settings", "asd", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 210, 10);
+            Compile = CreateButton("Compile", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 100, 10);
+            Settings = CreateButton(null, Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 950, 5);
             topPanel.Controls.Add(Compile);
             topPanel.Controls.Add(Settings);
 
@@ -66,11 +66,13 @@ namespace Nerin.NerinIDE
             mainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
         }
 
-        private Button CreateButton(string text, string icon, Color fore_color, Color back_color, AnchorStyles anchor, int x, int y)
+
+        //Work in progress
+        private Button CreateButton(string text, Color fore_color, Color back_color, AnchorStyles anchor, int x, int y)
         {
             Button button = new Button();
 
-            if(icon == null)
+            if (text != null)
             {
                 button.Text = text;
                 button.Location = new Point(x, y);
@@ -78,19 +80,20 @@ namespace Nerin.NerinIDE
                 button.Margin = new Padding(10);
                 button.ForeColor = fore_color;
                 button.BackColor = back_color;
-                return button;
             }
             else
             {
                 button.Image = Properties.Resources.settings;
-                button.ImageAlign = ContentAlignment.MiddleLeft;
+                button.Size = new Size(35, 35);
+                button.ImageAlign = ContentAlignment.MiddleCenter;
                 button.Location = new Point(x, y);
                 button.Anchor = anchor;
                 button.Margin = new Padding(10);
                 button.ForeColor = fore_color;
                 button.BackColor = back_color;
-                return button;
             }
+
+            return button;
         }
 
         private void InitializeEventHandlers()
