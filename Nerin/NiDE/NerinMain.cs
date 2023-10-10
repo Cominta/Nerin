@@ -8,6 +8,8 @@ using NerinLib;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics.Tracing;
+using NerinLib.Symbols;
+using NerinLib.Analyzers;
 
 namespace Nerin.NerinIDE
 {
@@ -144,11 +146,13 @@ namespace Nerin.NerinIDE
             string[] lines = GetText().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             StringBuilder resultBuilder = new StringBuilder();
 
-            Dictionary<string, object> variables = new Dictionary<string, object>();
+            Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
+            Compilation previous = null;
 
             foreach (string line in lines)
             {
-                Compilation compilation = new Compilation(line);
+                SyntaxTree tree = SyntaxTree.Parse(line);
+                Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                 EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
                 string lineResult = resultBound.Value.ToString();
@@ -190,11 +194,14 @@ namespace Nerin.NerinIDE
             {
                 string[] lines = MainWindow.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                 Parser parser = new Parser();
-                Dictionary<string, object> variables = new Dictionary<string, object>();
+
+                Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
+                Compilation previous = null;
 
                 foreach (string line in lines)
                 {
-                    Compilation compilation = new Compilation(line);
+                    SyntaxTree tree = SyntaxTree.Parse(line);
+                    Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                     EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
                     string lineResult = resultBound.Value.ToString();
