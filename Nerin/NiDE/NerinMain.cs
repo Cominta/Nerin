@@ -15,7 +15,7 @@ namespace Nerin.NerinIDE
     {
         private TextBox MainWindow;
         private Button Compile;
-        private Button Settings;
+        private PictureBox Settings;
         private string _inputText = "";
         private bool error = false;
 
@@ -29,6 +29,9 @@ namespace Nerin.NerinIDE
             InitializeComponent();
             InitializeLayout();
             InitializeEventHandlers();
+
+            this.MinimumSize = new Size(600, 400);
+            this.MaximumSize = new Size(7680, 4320);
         }
 
         private void InitializeLayout()
@@ -55,45 +58,41 @@ namespace Nerin.NerinIDE
             MainWindow = mainTextBox;
 
             Compile = CreateButton("Compile", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 100, 10);
-            Settings = CreateButton(null, Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 950, 5);
+
+            Image settings = Properties.Resources.settings;//path to image "settings"
+
+            Settings = CreatePictureBox(settings, topPanel.Width - 950, 5);
+
             topPanel.Controls.Add(Compile);
             topPanel.Controls.Add(Settings);
 
-
-            topPanel.BorderStyle = BorderStyle.None;
             topPanel.BackColor = Color.FromArgb(38, 38, 38);
             mainTextBox.BackColor = Color.FromArgb(67, 67, 67);
             mainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
         }
 
-
-        //Work in progress
         private Button CreateButton(string text, Color fore_color, Color back_color, AnchorStyles anchor, int x, int y)
         {
             Button button = new Button();
-
-            if (text != null)
-            {
-                button.Text = text;
-                button.Location = new Point(x, y);
-                button.Anchor = anchor;
-                button.Margin = new Padding(10);
-                button.ForeColor = fore_color;
-                button.BackColor = back_color;
-            }
-            else
-            {
-                button.Image = Properties.Resources.settings;
-                button.Size = new Size(35, 35);
-                button.ImageAlign = ContentAlignment.MiddleCenter;
-                button.Location = new Point(x, y);
-                button.Anchor = anchor;
-                button.Margin = new Padding(10);
-                button.ForeColor = fore_color;
-                button.BackColor = back_color;
-            }
+            button.Text = text;
+            button.Location = new Point(x, y);
+            button.Anchor = anchor;
+            button.Margin = new Padding(10);
+            button.ForeColor = fore_color;
+            button.BackColor = back_color;
 
             return button;
+        }
+
+        private PictureBox CreatePictureBox(Image image, int x, int y)
+        {
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Image = image;
+            pictureBox.Location = new Point(x, y);
+            pictureBox.Size = new Size(35, 35);
+            pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            return pictureBox;
         }
 
         private void InitializeEventHandlers()
@@ -103,8 +102,6 @@ namespace Nerin.NerinIDE
             Compile.MouseLeave += Compile_MouseLeave;
 
             Settings.Click += SettingsButton_Click;
-            Settings.MouseEnter += Settings_MouseEnter;
-            Settings.MouseLeave += Settings_MouseLeave;
 
             MainWindow.TextChanged += Console_TextChanged;
             MainWindow.TextChanged += MainWindow_TextChanged;
@@ -170,16 +167,6 @@ namespace Nerin.NerinIDE
         private void Compile_MouseLeave(object sender, EventArgs e)
         {
             Compile.BackColor = Color.FromArgb(67, 67, 67); // start color
-        }
-
-        private void Settings_MouseEnter(object sender, EventArgs e)
-        {
-            Settings.BackColor = Color.FromArgb(100, 100, 100);
-        }
-
-        private void Settings_MouseLeave(object sender, EventArgs e)
-        {
-            Settings.BackColor = Color.FromArgb(67, 67, 67); // start color
         }
 
         private void Console_TextChanged(object sender, EventArgs e)
