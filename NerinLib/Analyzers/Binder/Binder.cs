@@ -5,16 +5,58 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Immutable;
+using NerinLib.Analyzers.Binder;
+using NerinLib;
+using NerinLib.Symbols;
 
 namespace Nerin.Analyzers.Binder
 {
     public class Binder
     {
-        private Dictionary<string, object> Variables;
+        private BoundScope Scope;
 
-        public Binder(Dictionary<string, object> variables) 
+        public Binder(BoundScope parent) 
         {
-            Variables = variables;
+            Scope = new BoundScope(parent);
+        }
+
+        public static BoundGlobalScope BindGlobal(BoundGlobalScope previous, CompilationUnit compilationUnit)
+        {
+            BoundScope parentScope = CreateParentScopes(previous);
+            Binder binder = new Binder(parentScope);
+            BoundExpr expr = binder.Bind(compilationUnit.Tree.Root);
+            ImmutableArray<VariableSymbol> variables = binder.Scope.GetVariables();
+
+            return new BoundGlobalScope(previous, variables, expr);
+        }
+
+        private static BoundScope CreateParentScopes(BoundGlobalScope previous)
+        {
+            Stack<BoundGlobalScope> stack = new Stack<BoundGlobalScope>();
+
+            while (previous != null)
+            {
+                stack.Push(previous);
+                previous = previous.Previous;
+            }
+
+            BoundScope parent = null;
+
+            while (stack.Count > 0)
+            {
+                previous = stack.Pop();
+                BoundScope scope = new BoundScope(parent);
+
+                foreach (VariableSymbol v in previous.Variables)
+                {
+                    scope.TryDeclare(v);
+                }
+
+                parent = scope;
+            }
+
+            return parent;
         }
 
         public BoundExpr Bind(Expr expr)
@@ -51,15 +93,29 @@ namespace Nerin.Analyzers.Binder
 
         private BoundExpr BindName(NameExpr expr)
         {
-            return new BoundVariableExpr(expr.Token.Text, Variables[expr.Token.Text].GetType());
+            string name = expr.Token.Text;
+            VariableSymbol var = null;
+            
+            if (!Scope.TryLookup(name, out var))
+            {
+                throw new Exception("Incorrect var");
+            }
+
+            return new BoundVariableExpr(var);
         }
 
         private BoundExpr BindAssigment(AssigmentExpr expr)
         {
             BoundExpr exprToAssigment = Bind(expr.Expression);
             string name = expr.Token.Text;
+            VariableSymbol var = new VariableSymbol(name, exprToAssigment.Type);
 
-            return new BoundAssigmentExpr(name, exprToAssigment);
+            if (!Scope.TryDeclare(var))
+            {
+                throw new Exception("Already declared");
+            }
+
+            return new BoundAssigmentExpr(var, exprToAssigment);
         }
 
         private BoundBinaryExpr BindBinaryExpr(BinaryExpr expr) 
