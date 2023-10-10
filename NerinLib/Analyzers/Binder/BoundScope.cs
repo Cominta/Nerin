@@ -55,13 +55,13 @@ namespace NerinLib.Analyzers.Binder
     {
         public BoundGlobalScope Previous { get; }
         public ImmutableArray<VariableSymbol> Variables;
-        public BoundExpr Expression;
+        public BoundStatement Statement;
 
-        public BoundGlobalScope(BoundGlobalScope previous, ImmutableArray<VariableSymbol> vars, BoundExpr expr)
+        public BoundGlobalScope(BoundGlobalScope previous, ImmutableArray<VariableSymbol> vars, BoundStatement statement)
         {
             Previous = previous;
             Variables = vars;
-            Expression = expr;
+            Statement = statement;
         }
     }
 }

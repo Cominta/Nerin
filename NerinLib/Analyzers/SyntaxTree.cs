@@ -10,9 +10,9 @@ namespace NerinLib.Analyzers
 {
     public class SyntaxTree
     {
-        public Expr Root { get; }
+        public CompilationUnit Root { get; }
 
-        public SyntaxTree(Expr root) 
+        public SyntaxTree(CompilationUnit root) 
         {
             Root = root;
         }

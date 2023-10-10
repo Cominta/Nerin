@@ -32,13 +32,17 @@ namespace Nerin.Analyzers.Items
 
         LeftBracket,
         RightBracket,
+        OpenBrace,
+        CloseBrace,
 
         BinaryExpr,
         BracketsExpr,
         LiteralExpr,
         UnaryExpr,
 
-        CompilationUnit
+        CompilationUnit,
+        BlockStatement,
+        ExpressionStatement
     }
 
     // Low-level token
@@ -61,9 +65,13 @@ namespace Nerin.Analyzers.Items
         }
     }
 
-    public abstract class Expr
+    public abstract class Syntax
     {
         public abstract TokensKind Kind { get; }
+    }
+
+    public abstract class Expr : Syntax
+    {
         public abstract IEnumerable<object> GetChild();
     }
 

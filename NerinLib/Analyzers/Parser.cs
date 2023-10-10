@@ -1,6 +1,8 @@
 using Nerin.Analyzers.Items;
+using NerinLib;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -86,10 +88,44 @@ namespace Nerin.Analyzers
             }
         }
 
-        public Expr Parse()
+        public CompilationUnit Parse()
+        {
+            Statement statement = ParseStatement();
+            return new CompilationUnit(statement);
+        }
+
+        private Statement ParseStatement()
+        {
+            if (Current.Kind == TokensKind.OpenBrace)
+            {
+                return ParseBlockExpr();
+            }
+
+            return ParseExprStatement();
+        }
+
+        private Statement ParseBlockExpr()
+        {
+            SyntaxToken openBrace = Current;
+            NextToken();
+            ImmutableArray<Statement>.Builder statements = ImmutableArray.CreateBuilder<Statement>();
+
+            while (Current.Kind != TokensKind.End || Current.Kind != TokensKind.CloseBrace)
+            {
+                Statement statement = ParseStatement();
+                statements.Add(statement);
+            }
+
+            SyntaxToken closeBrace = Current;
+            NextToken();
+
+            return new BlockStatement(openBrace, statements.ToImmutable(), closeBrace);
+        }
+
+        private ExprStatement ParseExprStatement()
         {
             Expr expr = ParseExpr();
-            return expr;
+            return new ExprStatement(expr);
         }
 
         private Expr ParseExpr()
@@ -155,7 +191,7 @@ namespace Nerin.Analyzers
             if (Current.Kind == TokensKind.LeftBracket)
             {
                 SyntaxToken left = NextToken();
-                Expr expr = Parse();
+                Expr expr = ParseExpr();
                 SyntaxToken right = Match(TokensKind.RightBracket);
 
                 return new BracketsExpr(left, right, expr);

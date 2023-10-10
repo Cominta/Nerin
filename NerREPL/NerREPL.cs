@@ -33,7 +33,7 @@ namespace NerREPL
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
 
                 bool errors = false;
-                Print("  ", compilation.Tree.Root, ref errors);
+                //Print("  ", compilation, ref errors);
 
                 if (!errors)
                 {
