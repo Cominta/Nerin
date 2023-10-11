@@ -104,6 +104,18 @@ namespace Nerin.Analyzers
                     value = null;
                     break;
 
+                case '{':
+                    NextPos();
+                    kind = TokensKind.OpenBrace;
+                    value = null;
+                    break;
+
+                case '}':
+                    NextPos();
+                    kind = TokensKind.CloseBrace;
+                    value = null;
+                    break;
+
                 case '&':
                     if (Peek(1) == '&')
                     {

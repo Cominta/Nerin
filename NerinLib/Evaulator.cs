@@ -1,5 +1,6 @@
 ﻿using Nerin.Analyzers;
 using Nerin.Analyzers.Binder.Items;
+using NerinLib;
 using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,12 @@ namespace Nerin
 {
     public class Evaulator
     {
-        private BoundExpr root { get; }
+        private BoundStatement root { get; }
         Dictionary<VariableSymbol, object> Variables;
 
-        public Evaulator(BoundExpr root, Dictionary<VariableSymbol, object> variables)
+        private object lastValue;
+
+        public Evaulator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
         {
             this.root = root;
             Variables = variables;
@@ -22,10 +25,46 @@ namespace Nerin
 
         public object Evaluate()
         {
-            return Evaluate(root);
+            EvaluateStatement(root);
+            return lastValue;
         }
 
-        private object Evaluate(BoundExpr node)
+        private void EvaluateStatement(BoundStatement statement)
+        {
+            switch (statement.Kind)
+            {
+                case BoundNodeKind.BlockStatement:
+                    EvaluateBlockStatement((BoundBlockStatement)statement);
+                    break;
+
+                case BoundNodeKind.ExprStatement:
+                    EvaluateExprStatement((BoundExprStatement)statement);
+                    break;
+
+                default:
+                    throw new Exception("Failed to evaluate");
+            }
+
+            //if (node.Kind == BoundNodeKind.BracketsExpr)
+            //{
+            //    return Evaluate(((BracketsExpr)node).Expression);
+            //}
+        }
+
+        private void EvaluateBlockStatement(BoundBlockStatement block)
+        {
+            foreach (BoundStatement stat in block.Statements)
+            {
+                EvaluateStatement(stat);
+            }
+        }
+
+        private void EvaluateExprStatement(BoundExprStatement statement)
+        {
+            lastValue = EvaluateExpr(statement.Expression);
+        }
+
+        private object EvaluateExpr(BoundExpr node)
         {
             switch (node.Kind)
             {
@@ -66,7 +105,7 @@ namespace Nerin
 
         private object EvaluateAssigment(BoundAssigmentExpr node)
         {
-            object value = Evaluate(node.Expression);
+            object value = EvaluateExpr(node.Expression);
             Variables[node.Var] = value;
 
             return value;
@@ -74,7 +113,7 @@ namespace Nerin
 
         private object EvaluateUnaryExpr(BoundUnaryExpr node)
         {
-            object result = Evaluate(((BoundUnaryExpr)node).Operand);
+            object result = EvaluateExpr(((BoundUnaryExpr)node).Operand);
 
             switch (((BoundUnaryExpr)node).Operator.BoundKind)
             {
@@ -93,8 +132,8 @@ namespace Nerin
 
         private object EvaluateBinaryExpr(BoundBinaryExpr node) 
         {
-            object left = Evaluate(((BoundBinaryExpr)node).Left);
-            object right = Evaluate(((BoundBinaryExpr)node).Right);
+            object left = EvaluateExpr(((BoundBinaryExpr)node).Left);
+            object right = EvaluateExpr(((BoundBinaryExpr)node).Right);
 
             switch (((BoundBinaryExpr)node).Operator.BoundKind)
             {

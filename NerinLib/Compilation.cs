@@ -8,6 +8,7 @@ using NerinLib.Analyzers.Binder;
 using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace NerinLib
             { 
                 if (globalScope == null)
                 {
-                    globalScope = Binder.BindGlobal(Previous?.GlobalScope, new CompilationUnit(Tree));
+                    globalScope = Binder.BindGlobal(Previous?.GlobalScope, new CompilationUnit(Tree.Root.Statement));
                 }
 
                 return globalScope;
@@ -52,7 +53,7 @@ namespace NerinLib
 
         public EvaluationResult EvaluateResult(Dictionary<VariableSymbol, object> variables)
         {
-            BoundExpr expr = GlobalScope.Expression;
+            BoundStatement expr = GlobalScope.Statement;
 
             Evaulator evaulator = new Evaulator(expr, variables);
             return new EvaluationResult(evaulator.Evaluate());
@@ -70,15 +71,47 @@ namespace NerinLib
         }
     }
 
-    public class CompilationUnit
+    public class CompilationUnit : Syntax
     {
-        public SyntaxTree Tree { get; }
+        public override TokensKind Kind => TokensKind.CompilationUnit;
+        public Statement Statement { get; }
         //public SyntaxToken TokenEnd { get; }
 
-        public CompilationUnit(SyntaxTree tree/*, SyntaxToken End*/)
+        public CompilationUnit(Statement statement/*, SyntaxToken End*/)
         {
-            Tree = tree; 
+            Statement = statement; 
             //TokenEnd = End;
+        }
+    }
+
+    public abstract class Statement : Syntax
+    {
+         
+    }
+
+    public class BlockStatement : Statement
+    {
+        public SyntaxToken OpenBrace { get; }
+        public SyntaxToken CloseBrace { get; }
+        public ImmutableArray<Statement> Statements { get; }
+        public override TokensKind Kind => TokensKind.BlockStatement;
+
+        public BlockStatement(SyntaxToken openBrace, ImmutableArray<Statement> statements, SyntaxToken closeBrace)
+        {
+            OpenBrace = openBrace;
+            CloseBrace = closeBrace;
+            Statements = statements;
+        }
+    }
+
+    public class ExprStatement : Statement
+    {
+        public override TokensKind Kind => TokensKind.ExpressionStatement;
+        public Expr Expression { get; }
+
+        public ExprStatement(Expr expression)
+        {
+            Expression = expression;
         }
     }
 }

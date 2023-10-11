@@ -2,6 +2,7 @@
 using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -15,7 +16,10 @@ namespace Nerin.Analyzers.Binder.Items
         BinaryExpr,
         UnaryExpr,
         Variable,
-        Assigment
+        Assigment,
+
+        BlockStatement,
+        ExprStatement
     }
 
     public abstract class BoundNode
@@ -114,6 +118,33 @@ namespace Nerin.Analyzers.Binder.Items
             Left = left;
             Right = right;
             Operator = _operator;
+        }
+    }
+
+    public abstract class BoundStatement : BoundNode
+    {
+
+    }
+
+    public class BoundBlockStatement : BoundStatement
+    {
+        public override BoundNodeKind Kind => BoundNodeKind.BlockStatement;
+        public ImmutableArray<BoundStatement> Statements { get; }
+
+        public BoundBlockStatement(ImmutableArray<BoundStatement> statements)
+        {
+            Statements = statements;
+        }
+    }
+
+    public class BoundExprStatement : BoundStatement
+    {
+        public override BoundNodeKind Kind => BoundNodeKind.ExprStatement;
+        public BoundExpr Expression { get; }
+
+        public BoundExprStatement(BoundExpr expr)
+        {
+            Expression = expr;
         }
     }
 }

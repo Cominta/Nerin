@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using NerinLib.Analyzers.Binder;
 using NerinLib;
 using NerinLib.Symbols;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Nerin.Analyzers.Binder
 {
@@ -25,10 +26,10 @@ namespace Nerin.Analyzers.Binder
         {
             BoundScope parentScope = CreateParentScopes(previous);
             Binder binder = new Binder(parentScope);
-            BoundExpr expr = binder.Bind(compilationUnit.Tree.Root);
+            BoundStatement statement = binder.BindStatement(compilationUnit.Statement);
             ImmutableArray<VariableSymbol> variables = binder.Scope.GetVariables();
 
-            return new BoundGlobalScope(previous, variables, expr);
+            return new BoundGlobalScope(previous, variables, statement);
         }
 
         private static BoundScope CreateParentScopes(BoundGlobalScope previous)
@@ -59,7 +60,41 @@ namespace Nerin.Analyzers.Binder
             return parent;
         }
 
-        public BoundExpr Bind(Expr expr)
+        private BoundStatement BindStatement(Statement statement)
+        {
+            switch (statement.Kind)
+            {
+                case TokensKind.BlockStatement:
+                    return BindBlockStatement((BlockStatement)statement);
+
+                case TokensKind.ExpressionStatement:
+                    return BindExpressionStatement((ExprStatement)statement);
+
+                default:
+                    throw new Exception("In Binder.Bind: Incorrect Statement");
+            }
+        }
+
+        private BoundExprStatement BindExpressionStatement(ExprStatement statement)
+        {
+            BoundExpr expr = BindExpr(statement.Expression);
+            return new BoundExprStatement(expr);
+        }
+
+        private BoundBlockStatement BindBlockStatement(BlockStatement statement)
+        {
+            ImmutableArray<BoundStatement>.Builder statements = ImmutableArray.CreateBuilder<BoundStatement>();
+
+            foreach (Statement statementSyntax in statement.Statements)
+            {
+                BoundStatement stat = BindStatement(statementSyntax);
+                statements.Add(stat);
+            }
+
+            return new BoundBlockStatement(statements.ToImmutable());
+        }
+
+        private BoundExpr BindExpr(Expr expr)
         {
             switch (expr.Kind)
             {
@@ -88,7 +123,7 @@ namespace Nerin.Analyzers.Binder
 
         private BoundExpr BindBrackets(BracketsExpr expr)
         {
-            return Bind(expr.Expression);
+            return BindExpr(expr.Expression);
         }
 
         private BoundExpr BindName(NameExpr expr)
@@ -106,13 +141,19 @@ namespace Nerin.Analyzers.Binder
 
         private BoundExpr BindAssigment(AssigmentExpr expr)
         {
-            BoundExpr exprToAssigment = Bind(expr.Expression);
+            BoundExpr exprToAssigment = BindExpr(expr.Expression);
             string name = expr.Token.Text;
             VariableSymbol var = new VariableSymbol(name, exprToAssigment.Type);
 
-            if (!Scope.TryDeclare(var))
+            if (!Scope.TryLookup(name, out var))
             {
-                throw new Exception("Already declared");
+                var = new VariableSymbol(name, exprToAssigment.Type);
+                Scope.TryDeclare(var);
+            }
+
+            if (exprToAssigment.Type != var.Type)
+            {
+                throw new Exception("Cannot convert"); 
             }
 
             return new BoundAssigmentExpr(var, exprToAssigment);
@@ -120,8 +161,8 @@ namespace Nerin.Analyzers.Binder
 
         private BoundBinaryExpr BindBinaryExpr(BinaryExpr expr) 
         {
-            BoundExpr left = Bind(expr.Left);
-            BoundExpr right = Bind(expr.Right);
+            BoundExpr left = BindExpr(expr.Left);
+            BoundExpr right = BindExpr(expr.Right);
             BoundBinaryOperator _operator = BoundBinaryOperator.Bind(expr.Operator.Kind, left.Type, right.Type);
 
             BoundBinaryExpr boundExpr = new BoundBinaryExpr(left, right, _operator);
@@ -130,7 +171,7 @@ namespace Nerin.Analyzers.Binder
 
         private BoundUnaryExpr BindUnaryExpr(UnaryExpr expr)
         {
-            BoundExpr operand = Bind(expr.Expression);
+            BoundExpr operand = BindExpr(expr.Expression);
             BoundUnaryOperator _operator = BoundUnaryOperator.Bind(expr.Unary.Kind, operand.Type);
 
             BoundUnaryExpr boundExpr = new BoundUnaryExpr(_operator, operand);
