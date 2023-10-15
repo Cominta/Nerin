@@ -1,6 +1,7 @@
 ﻿using Nerin.Analyzers.Items;
 using Nerin.Analyzers;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -10,14 +11,22 @@ using System.Runtime.InteropServices;
 using System.Diagnostics.Tracing;
 using NerinLib.Symbols;
 using NerinLib.Analyzers;
+using System.ComponentModel;
+using Nerin.NiDE;
 
 namespace Nerin.NerinIDE
 {
     public partial class NideMain : Form
     {
         private TextBox MainWindow;
+
         private Button Compile;
+        private Button Save;
+
         private PictureBox Settings;
+
+        private Creator creator = new Creator();
+
         private string _inputText = "";
         private bool error = false;
 
@@ -41,15 +50,16 @@ namespace Nerin.NerinIDE
             TableLayoutPanel mainTable = new TableLayoutPanel();
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Controls.Add(mainTable);
+            
             mainTable.Dock = DockStyle.Fill;
             mainTable.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
-            
             mainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+
             Panel topPanel = new Panel();
             topPanel.Dock = DockStyle.Fill;
             mainTable.Controls.Add(topPanel, 0, 0);
 
-            mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            //mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             TextBox mainTextBox = new TextBox();
             mainTextBox.Multiline = true;
             mainTextBox.ScrollBars = ScrollBars.Both;
@@ -59,42 +69,20 @@ namespace Nerin.NerinIDE
 
             MainWindow = mainTextBox;
 
-            Compile = CreateButton("Compile", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, topPanel.Width - 100, 10);
-
-            Image settings = Properties.Resources.settings;//path to image "settings"
-
-            Settings = CreatePictureBox(settings, topPanel.Width - 950, 5);
-
+            Compile = creator.CreateButton("Compile", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, mainTextBox.Width - 100, 10);
             topPanel.Controls.Add(Compile);
+
+            Save = creator.CreateButton("Save", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Left, mainTextBox.Width - 900, 10);
+            topPanel.Controls.Add(Save);
+
+            Image settings = Properties.Resources.settings; //path to image "settings"
+
+            Settings = creator.CreatePictureBox(settings, topPanel.Width - 950, 5);
             topPanel.Controls.Add(Settings);
 
             topPanel.BackColor = Color.FromArgb(38, 38, 38);
             mainTextBox.BackColor = Color.FromArgb(67, 67, 67);
             mainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
-        }
-
-        private Button CreateButton(string text, Color fore_color, Color back_color, AnchorStyles anchor, int x, int y)
-        {
-            Button button = new Button();
-            button.Text = text;
-            button.Location = new Point(x, y);
-            button.Anchor = anchor;
-            button.Margin = new Padding(10);
-            button.ForeColor = fore_color;
-            button.BackColor = back_color;
-
-            return button;
-        }
-
-        private PictureBox CreatePictureBox(Image image, int x, int y)
-        {
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Image = image;
-            pictureBox.Location = new Point(x, y);
-            pictureBox.Size = new Size(35, 35);
-            pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-
-            return pictureBox;
         }
 
         private void InitializeEventHandlers()
@@ -103,7 +91,11 @@ namespace Nerin.NerinIDE
             Compile.MouseEnter += Compile_MouseEnter;
             Compile.MouseLeave += Compile_MouseLeave;
 
-            Settings.Click += SettingsButton_Click;
+            //Save.Click += Save_Click;
+            Save.MouseEnter += Save_MouseEnter;
+            Save.MouseLeave += Save_MouseLeave;
+            
+            Settings.Click += Settings_Click;
 
             MainWindow.TextChanged += Console_TextChanged;
             MainWindow.TextChanged += MainWindow_TextChanged;
@@ -136,11 +128,11 @@ namespace Nerin.NerinIDE
             }
         }
 
-        private void SettingsButton_Click(object sender, EventArgs e)
+        private void Settings_Click(object sender, EventArgs e)
         {
             ShowSettings();
         }
-
+        
         private void ShowConsole()
         {
             string[] lines = GetText().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
@@ -171,6 +163,16 @@ namespace Nerin.NerinIDE
         private void Compile_MouseLeave(object sender, EventArgs e)
         {
             Compile.BackColor = Color.FromArgb(67, 67, 67); // start color
+        }
+
+        private void Save_MouseEnter(object sender, EventArgs e)
+        {
+            Save.BackColor = Color.FromArgb(100, 100, 100);
+        }
+
+        private void Save_MouseLeave(object sender, EventArgs e)
+        {
+            Save.BackColor = Color.FromArgb(67, 67, 67); // start color
         }
 
         private void Console_TextChanged(object sender, EventArgs e)

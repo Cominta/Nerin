@@ -91,44 +91,19 @@ namespace Nerin.NerinIDE
             Settings.FormBorderStyle = FormBorderStyle.FixedSingle;
             Settings.StartPosition = FormStartPosition.CenterParent;
 
-            Label FontLabel = new Label();
-            FontLabel.Text = "Font size:";
-            FontLabel.ForeColor = Color.White;
-            FontLabel.Location = new Point(20, 20);
+            NumericUpDown Font, Width, Height;
+            Font = creator.CreateNumericUpDown(5, 40, (int)MainWindow.Font.Size, 150, 20);
+            Width = creator.CreateNumericUpDown(320, 7680, this.Width, 150, 60);
+            Height = creator.CreateNumericUpDown(240, 4320, this.Height, 150, 100);
 
-            NumericUpDown Font = new NumericUpDown();
-            Font.Minimum = 5;
-            Font.Maximum = 40;
-            Font.Value = (decimal)MainWindow.Font.Size;
-            Font.Location = new Point(150, 20);
+            Label FontLabel, HeightLabel, WidthLabel;
+            FontLabel = creator.CreateLabel("Font size:", Color.White, 20, 20);
+            WidthLabel = creator.CreateLabel("Width size:", Color.White, 20, 60);
+            HeightLabel = creator.CreateLabel("Window height:", Color.White, 20, 100);
 
-            Label WidthLabel = new Label();
-            WidthLabel.Text = "Window width:";
-            WidthLabel.ForeColor = Color.White;
-            WidthLabel.Location = new Point(20, 60);
+            Button Apply;
+            Apply = creator.CreateButton("Apply", Color.Black, Color.Gray, AnchorStyles.Bottom, 100, 150);
 
-            NumericUpDown WidthNumericUpDown = new NumericUpDown();
-            WidthNumericUpDown.Minimum = 320;
-            WidthNumericUpDown.Maximum = 7680;
-            WidthNumericUpDown.Value = this.Width;
-            WidthNumericUpDown.Location = new Point(150, 60);
-
-            Label HeightLabel = new Label();
-            HeightLabel.Text = "Window height:";
-            HeightLabel.ForeColor = Color.White;
-            HeightLabel.Location = new Point(20, 100);
-
-            NumericUpDown HeightNumericUpDown = new NumericUpDown();
-            HeightNumericUpDown.Minimum = 240;
-            HeightNumericUpDown.Maximum = 4320;
-            HeightNumericUpDown.Value = this.Height;
-            HeightNumericUpDown.Location = new Point(150, 100);
-
-            Button Apply = new Button();
-            Apply.Text = "Apply";
-            Apply.ForeColor = Color.Black;
-            Apply.BackColor = Color.Gray;
-            Apply.Location = new Point(100, 150);
             Apply.Click += (s, e) =>
             {
                 if (float.TryParse(Font.Value.ToString(), out float fontSize))
@@ -136,8 +111,8 @@ namespace Nerin.NerinIDE
                     MainWindow.Font = new Font(MainWindow.Font.FontFamily, fontSize);
                 }
 
-                this.Width = (int)WidthNumericUpDown.Value;
-                this.Height = (int)HeightNumericUpDown.Value;
+                this.Width = (int)Width.Value;
+                this.Height = (int)Height.Value;
                 Settings.Close();
             };
 
@@ -147,9 +122,9 @@ namespace Nerin.NerinIDE
             Settings.Controls.Add(FontLabel);
             Settings.Controls.Add(Font);
             Settings.Controls.Add(WidthLabel);
-            Settings.Controls.Add(WidthNumericUpDown);
+            Settings.Controls.Add(Width);
             Settings.Controls.Add(HeightLabel);
-            Settings.Controls.Add(HeightNumericUpDown);
+            Settings.Controls.Add(Height);
             Settings.Controls.Add(Apply);
 
             Settings.ShowDialog();
