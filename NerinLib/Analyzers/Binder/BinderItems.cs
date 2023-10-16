@@ -19,7 +19,8 @@ namespace Nerin.Analyzers.Binder.Items
         Assigment,
 
         BlockStatement,
-        ExprStatement
+        ExprStatement,
+        VariableDeclarationStatement
     }
 
     public abstract class BoundNode
@@ -145,6 +146,20 @@ namespace Nerin.Analyzers.Binder.Items
         public BoundExprStatement(BoundExpr expr)
         {
             Expression = expr;
+        }
+    }
+
+    public class BoundVariableDeclarationStatement : BoundStatement
+    {
+        public override BoundNodeKind Kind => BoundNodeKind.VariableDeclarationStatement;
+
+        public VariableSymbol Variable { get; }
+        public BoundExpr Initializer { get; }
+
+        public BoundVariableDeclarationStatement(VariableSymbol variable, BoundExpr initializer)
+        {
+            Variable = variable;
+            Initializer = initializer;
         }
     }
 }

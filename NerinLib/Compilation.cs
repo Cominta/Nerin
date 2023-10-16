@@ -4,7 +4,9 @@ using Nerin.Analyzers.Binder;
 using Nerin.Analyzers.Binder.Items;
 using Nerin.Analyzers.Items;
 using NerinLib.Analyzers;
+using NerinLib.Analyzers.Statements;
 using NerinLib.Analyzers.Binder;
+using NerinLib.Diagnostics;
 using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
@@ -39,7 +41,7 @@ namespace NerinLib
             { 
                 if (globalScope == null)
                 {
-                    globalScope = Binder.BindGlobal(Previous?.GlobalScope, new CompilationUnit(Tree.Root.Statement));
+                    globalScope = Binder.BindGlobal(Previous?.GlobalScope, Tree.Root);
                 }
 
                 return globalScope;
@@ -55,8 +57,15 @@ namespace NerinLib
         {
             BoundStatement expr = GlobalScope.Statement;
 
+            ImmutableArray<Diagnostic> diagnostics = Tree.Diagnostics.Concat(globalScope.Diagnostics).ToImmutableArray();
+
+            if (diagnostics.Any())
+            {
+                return new EvaluationResult(null, diagnostics);
+            }
+
             Evaulator evaulator = new Evaulator(expr, variables);
-            return new EvaluationResult(evaulator.Evaluate());
+            return new EvaluationResult(evaulator.Evaluate(), Array.Empty<Diagnostic>());
         }
     }
 
@@ -64,9 +73,11 @@ namespace NerinLib
     public class EvaluationResult
     {
         public object Value { get; }
+        public IReadOnlyList<Diagnostic> Diagnostics;
 
-        public EvaluationResult(object value) 
+        public EvaluationResult(object value, IEnumerable<Diagnostic> diagnostics) 
         {
+            Diagnostics = diagnostics.ToArray();
             Value = value;
         }
     }
@@ -75,43 +86,12 @@ namespace NerinLib
     {
         public override TokensKind Kind => TokensKind.CompilationUnit;
         public Statement Statement { get; }
-        //public SyntaxToken TokenEnd { get; }
+        public SyntaxToken End { get; }
 
-        public CompilationUnit(Statement statement/*, SyntaxToken End*/)
+        public CompilationUnit(Statement statement, SyntaxToken end)
         {
-            Statement = statement; 
-            //TokenEnd = End;
-        }
-    }
-
-    public abstract class Statement : Syntax
-    {
-         
-    }
-
-    public class BlockStatement : Statement
-    {
-        public SyntaxToken OpenBrace { get; }
-        public SyntaxToken CloseBrace { get; }
-        public ImmutableArray<Statement> Statements { get; }
-        public override TokensKind Kind => TokensKind.BlockStatement;
-
-        public BlockStatement(SyntaxToken openBrace, ImmutableArray<Statement> statements, SyntaxToken closeBrace)
-        {
-            OpenBrace = openBrace;
-            CloseBrace = closeBrace;
-            Statements = statements;
-        }
-    }
-
-    public class ExprStatement : Statement
-    {
-        public override TokensKind Kind => TokensKind.ExpressionStatement;
-        public Expr Expression { get; }
-
-        public ExprStatement(Expr expression)
-        {
-            Expression = expression;
+            Statement = statement;
+            End = end;
         }
     }
 }

@@ -51,6 +51,7 @@
     <Compile Include="NiDE\NerinMain.Designer.cs">
       <DependentUpon>NerinMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="NiDE\NideConsole.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,14 +63,6 @@
       <Project>{8f2ef334-da56-40b3-adbe-ab34025d7cd2}</Project>
       <Name>NerinLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="NiDE\NerinMain.resx">
-      <DependentUpon>NerinMain.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Icons\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

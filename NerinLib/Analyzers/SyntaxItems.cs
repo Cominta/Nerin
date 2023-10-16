@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NerinLib;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace Nerin.Analyzers.Items
         FalseValue,
         Name,
         Assigment,
+        LetKeyword,
+        VarKeyword,
 
         Plus,
         Minus,
@@ -42,7 +45,8 @@ namespace Nerin.Analyzers.Items
 
         CompilationUnit,
         BlockStatement,
-        ExpressionStatement
+        ExpressionStatement,
+        VariableDeclarationStatement
     }
 
     // Low-level token
@@ -51,12 +55,15 @@ namespace Nerin.Analyzers.Items
         public override TokensKind Kind { get; }
         public string Text { get; }
         public object Value { get; }
+        public int Pos { get; }
+        public TextSpan Span => new TextSpan(Pos, Text?.Length ?? 0);
 
-        public SyntaxToken(TokensKind kind, string text, object value)
+        public SyntaxToken(TokensKind kind, string text, object value, int pos)
         {
             Kind = kind;
             Text = text;
             Value = value;
+            Pos = pos;
         }
 
         public override IEnumerable<object> GetChild()

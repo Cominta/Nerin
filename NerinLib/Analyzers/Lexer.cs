@@ -1,4 +1,6 @@
 ﻿using Nerin.Analyzers.Items;
+using NerinLib;
+using NerinLib.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
@@ -11,13 +13,16 @@ namespace Nerin.Analyzers
     // Make Low-level tokens (SyntaxToken)
     public class Lexer
     {
-        private string text;
+        private SourceText text;
         private int pos;
 
         private int start;
         private TokensKind kind;
         private object value;
         private string symbols;
+
+        private DiagnosticBag diagnostics = new DiagnosticBag();
+        public DiagnosticBag Diagnostics => diagnostics;
 
         private char Current => Peek(0);
 
@@ -31,7 +36,7 @@ namespace Nerin.Analyzers
             return text[pos + offset];
         }
 
-        public Lexer(string text)
+        public Lexer(SourceText text)
         {
             SetText(text);
         }
@@ -41,7 +46,7 @@ namespace Nerin.Analyzers
 
         }
 
-        public void SetText(string text)
+        public void SetText(SourceText text)
         {
             this.text = text;
             this.pos = 0;
@@ -168,36 +173,45 @@ namespace Nerin.Analyzers
 
                     break;
 
-                default:
-                    // Number
-                    if (char.IsDigit(Current))
-                    {
-                        LexDigit();
-                    }
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    LexDigit();
+                    break;
 
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    LexWhiteSpace();
+                    break;
+
+                default:
                     // True, False, Variables
-                    else if (char.IsLetter(Current))
+                    if (char.IsLetter(Current))
                     {
                         LexLetters();
                     }
 
-                    else if (char.IsWhiteSpace(Current))
-                    {
-                        LexWhiteSpace();
-                    }
-
                     else
                     {
-                        kind = TokensKind.Bad;
-                        value = null;
+                        diagnostics.ReportBadCharacter(pos, Current);
+                        NextPos();
                     }
 
                     break;
             }
 
-            symbols = text.Substring(start, pos - start);
+            symbols = text.ToString(start, pos - start);
 
-            return new SyntaxToken(kind, symbols, value);
+            return new SyntaxToken(kind, symbols, value, start);
         }
 
         private void LexDigit()
@@ -208,8 +222,12 @@ namespace Nerin.Analyzers
             }
 
             int number = 0;
-            string numberStr = text.Substring(start, pos - start);
-            int.TryParse(numberStr, out number);
+            string numberStr = text.ToString(start, pos - start);
+
+            if (!int.TryParse(numberStr, out number))
+            {
+                diagnostics.ReportInvalidNumber(new TextSpan(start, pos - start), numberStr, typeof(int));
+            }
 
             value = number;
             symbols = numberStr;
@@ -235,7 +253,7 @@ namespace Nerin.Analyzers
                 NextPos();
             }
 
-            string word = text.Substring(start, pos - start);
+            string word = text.ToString(start, pos - start);
             kind = SyntaxPriority.GetKeywordKind(word);
             value = null;
 

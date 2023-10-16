@@ -63,12 +63,15 @@
     <Compile Include="Analyzers\Binder\BoundScope.cs" />
     <Compile Include="Analyzers\Lexer.cs" />
     <Compile Include="Analyzers\Parser.cs" />
+    <Compile Include="Analyzers\Statements.cs" />
     <Compile Include="Analyzers\SyntaxItems.cs" />
     <Compile Include="Analyzers\SyntaxPriority.cs" />
     <Compile Include="Analyzers\SyntaxTree.cs" />
     <Compile Include="Compilation.cs" />
+    <Compile Include="Diagnostics\Diagnostic.cs" />
     <Compile Include="Evaulator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceText.cs" />
     <Compile Include="Symbols\Symbol.cs" />
     <Compile Include="Symbols\VariableSymbol.cs" />
   </ItemGroup>

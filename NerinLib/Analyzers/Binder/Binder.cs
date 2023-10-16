@@ -2,6 +2,7 @@
 using Nerin.Analyzers.Binder.Items;
 using System;
 using System.Collections.Generic;
+using NerinLib.Analyzers.Statements;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,16 @@ using NerinLib.Analyzers.Binder;
 using NerinLib;
 using NerinLib.Symbols;
 using System.Runtime.InteropServices.WindowsRuntime;
+using NerinLib.Diagnostics;
 
 namespace Nerin.Analyzers.Binder
 {
     public class Binder
     {
         private BoundScope Scope;
+
+        private DiagnosticBag diagnostics = new DiagnosticBag();
+        public DiagnosticBag Diagnostics => diagnostics;
 
         public Binder(BoundScope parent) 
         {
@@ -28,8 +33,14 @@ namespace Nerin.Analyzers.Binder
             Binder binder = new Binder(parentScope);
             BoundStatement statement = binder.BindStatement(compilationUnit.Statement);
             ImmutableArray<VariableSymbol> variables = binder.Scope.GetVariables();
+            ImmutableArray<Diagnostic> _diagnostics = binder.Diagnostics.ToImmutableArray();
 
-            return new BoundGlobalScope(previous, variables, statement);
+            if (previous != null)
+            {
+                _diagnostics = _diagnostics.InsertRange(0, previous.Diagnostics);
+            }
+
+            return new BoundGlobalScope(previous, _diagnostics, variables, statement);
         }
 
         private static BoundScope CreateParentScopes(BoundGlobalScope previous)
@@ -67,6 +78,9 @@ namespace Nerin.Analyzers.Binder
                 case TokensKind.BlockStatement:
                     return BindBlockStatement((BlockStatement)statement);
 
+                case TokensKind.VariableDeclarationStatement:
+                    return BindVariableDeclarationStatement((VariableDeclarationStatement)statement);
+
                 case TokensKind.ExpressionStatement:
                     return BindExpressionStatement((ExprStatement)statement);
 
@@ -81,15 +95,33 @@ namespace Nerin.Analyzers.Binder
             return new BoundExprStatement(expr);
         }
 
+        private BoundVariableDeclarationStatement BindVariableDeclarationStatement(VariableDeclarationStatement statement)
+        {
+            string name = statement.Identifier.Text;
+            bool isReadOnly = statement.Keyword.Kind == TokensKind.LetKeyword;
+            BoundExpr initializer = BindExpr(statement.Initializer);
+            VariableSymbol symbol = new VariableSymbol(name, isReadOnly, initializer.Type);
+
+            if (!Scope.TryDeclare(symbol))
+            {
+                diagnostics.ReportVariableAlreadyDeclared(statement.Identifier.Span, name);
+            }
+
+            return new BoundVariableDeclarationStatement(symbol, initializer);
+        }
+
         private BoundBlockStatement BindBlockStatement(BlockStatement statement)
         {
             ImmutableArray<BoundStatement>.Builder statements = ImmutableArray.CreateBuilder<BoundStatement>();
+            Scope = new BoundScope(Scope);
 
             foreach (Statement statementSyntax in statement.Statements)
             {
                 BoundStatement stat = BindStatement(statementSyntax);
                 statements.Add(stat);
             }
+
+            Scope = Scope.Parent;
 
             return new BoundBlockStatement(statements.ToImmutable());
         }
@@ -133,7 +165,8 @@ namespace Nerin.Analyzers.Binder
             
             if (!Scope.TryLookup(name, out var))
             {
-                throw new Exception("Incorrect var");
+                diagnostics.ReportUndefinedName(expr.Token.Span, name);
+                return new BoundLiteralExpr(0);
             }
 
             return new BoundVariableExpr(var);
@@ -143,36 +176,53 @@ namespace Nerin.Analyzers.Binder
         {
             BoundExpr exprToAssigment = BindExpr(expr.Expression);
             string name = expr.Token.Text;
-            VariableSymbol var = new VariableSymbol(name, exprToAssigment.Type);
 
-            if (!Scope.TryLookup(name, out var))
+            if (!Scope.TryLookup(name, out VariableSymbol var))
             {
-                var = new VariableSymbol(name, exprToAssigment.Type);
-                Scope.TryDeclare(var);
+                diagnostics.ReportUndefinedName(expr.Token.Span, name);
+                return exprToAssigment;
+            }
+
+            if (var.isReadOnly)
+            {
+                diagnostics.ReportCannotAssign(expr.EqualsToken.Span, name);
             }
 
             if (exprToAssigment.Type != var.Type)
             {
-                throw new Exception("Cannot convert"); 
+                diagnostics.ReportCannotConvert(expr.Token.Span, exprToAssigment.Type, var.Type);
+                return exprToAssigment;
             }
 
             return new BoundAssigmentExpr(var, exprToAssigment);
         }
 
-        private BoundBinaryExpr BindBinaryExpr(BinaryExpr expr) 
+        private BoundExpr BindBinaryExpr(BinaryExpr expr) 
         {
             BoundExpr left = BindExpr(expr.Left);
             BoundExpr right = BindExpr(expr.Right);
             BoundBinaryOperator _operator = BoundBinaryOperator.Bind(expr.Operator.Kind, left.Type, right.Type);
 
+            if (_operator == null)
+            {
+                diagnostics.ReportUndefinedBinaryOperator(expr.Operator.Span, expr.Operator.Text, left.Type, right.Type);
+                return left;
+            }
+
             BoundBinaryExpr boundExpr = new BoundBinaryExpr(left, right, _operator);
             return boundExpr;
         }
 
-        private BoundUnaryExpr BindUnaryExpr(UnaryExpr expr)
+        private BoundExpr BindUnaryExpr(UnaryExpr expr)
         {
             BoundExpr operand = BindExpr(expr.Expression);
             BoundUnaryOperator _operator = BoundUnaryOperator.Bind(expr.Unary.Kind, operand.Type);
+
+            if (_operator == null)
+            {
+                diagnostics.ReportUndefinedUnaryOperator(expr.Unary.Span, expr.Unary.Text, operand.Type);
+                return operand;
+            }
 
             BoundUnaryExpr boundExpr = new BoundUnaryExpr(_operator, operand);
             return boundExpr;

@@ -19,29 +19,93 @@ namespace NerREPL
             Parser parser = new Parser();
             Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
             Compilation previous = null;
+            ConsoleColor color = Console.ForegroundColor;
+
+            StringBuilder builder = new StringBuilder();
 
             while (true)
             {
-                Console.Write("> ");
+                if (builder.Length == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("> ");
+                    Console.ForegroundColor = color;
+                }
+
+                else
+                {
+                    Console.Write("| ");
+                }
+
                 currentStr = Console.ReadLine();
 
-                SyntaxTree tree = SyntaxTree.Parse(currentStr);
+                if (builder.Length == 0 && string.IsNullOrWhiteSpace(currentStr))
+                {
+                    break; 
+                }
+
+                builder.AppendLine(currentStr);
+                string text = builder.ToString();
+
+                SyntaxTree tree = SyntaxTree.Parse(text);
+
+                if (!string.IsNullOrWhiteSpace(currentStr) && tree.Diagnostics.Any())
+                {
+                    continue;
+                }
+
                 Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                 EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
-                ConsoleColor color = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-
-                bool errors = false;
-                //Print("  ", compilation, ref errors);
-
-                if (!errors)
+                if (resultBound.Diagnostics.Any())
                 {
-                    Console.WriteLine($"Result = {resultBound.Value}");
+                    SourceText textS = tree.Text;
+
+                    foreach (var diagnostic in resultBound.Diagnostics)
+                    {
+                        int lineIndex = textS.GetLineIndex(diagnostic.Span.Start);
+                        TextLine line = tree.Text.Lines[lineIndex];
+                        int lineNumber = lineIndex + 1;
+                        int character = diagnostic.Span.Start - line.Start + 1;
+
+                        Console.WriteLine();
+
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write($"({lineNumber}, {character}): ");
+                        Console.WriteLine(diagnostic.ToString());
+                        Console.ForegroundColor = color;
+
+                        TextSpan prefixSpan = TextSpan.FromBounds(line.Start, diagnostic.Span.Start);
+                        TextSpan suffixSpan = TextSpan.FromBounds(diagnostic.Span.End, line.End);
+
+                        string prefix = tree.Text.ToString(prefixSpan);
+                        string error = tree.Text.ToString(diagnostic.Span);
+                        string suffix = tree.Text.ToString(suffixSpan);
+
+                        Console.Write("    ");
+                        Console.Write(prefix);
+
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write(error);
+                        Console.ForegroundColor = color;
+
+                        Console.Write(suffix);
+
+                        Console.WriteLine();
+                    }
+
+                    Console.WriteLine();
+                }
+
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"Result = {resultBound.Value}\n");
+                    Console.ForegroundColor = color;
                     previous = compilation;
                 }
 
-                Console.ForegroundColor = color;
+                builder.Clear();
             }
         }
 

@@ -37,6 +37,10 @@ namespace Nerin
                     EvaluateBlockStatement((BoundBlockStatement)statement);
                     break;
 
+                case BoundNodeKind.VariableDeclarationStatement:
+                    EvaluateVariableDeclarationStatement((BoundVariableDeclarationStatement)statement);
+                    break;
+
                 case BoundNodeKind.ExprStatement:
                     EvaluateExprStatement((BoundExprStatement)statement);
                     break;
@@ -57,6 +61,13 @@ namespace Nerin
             {
                 EvaluateStatement(stat);
             }
+        }
+
+        private void EvaluateVariableDeclarationStatement(BoundVariableDeclarationStatement statement)
+        {
+            object value = EvaluateExpr(statement.Initializer);
+            Variables[statement.Variable] = value;
+            lastValue = value;
         }
 
         private void EvaluateExprStatement(BoundExprStatement statement)

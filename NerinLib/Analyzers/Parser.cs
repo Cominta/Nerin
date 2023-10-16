@@ -1,6 +1,8 @@
 using Nerin.Analyzers.Items;
 using NerinLib;
+using NerinLib.Diagnostics;
 using System;
+using NerinLib.Analyzers.Statements;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -13,11 +15,14 @@ namespace Nerin.Analyzers
     // Makes High-level tokens (Expr)
     public class Parser
     {
-        private string text;
+        private SourceText text;
         private int pos;
         List<SyntaxToken> tokens;
 
-        public Parser(string text)
+        private DiagnosticBag diagnostics = new DiagnosticBag();
+        public DiagnosticBag Diagnostics => diagnostics;
+
+        public Parser(SourceText text)
         {
             tokens = new List<SyntaxToken>();
             SetText(text);
@@ -28,7 +33,7 @@ namespace Nerin.Analyzers
             tokens = new List<SyntaxToken>();
         }
 
-        public void SetText(string text)
+        public void SetText(SourceText text)
         {
             this.text = text;
             this.pos = 0;
@@ -64,7 +69,8 @@ namespace Nerin.Analyzers
                 return NextToken();
             }
 
-            return new SyntaxToken(TokensKind.Bad, null, null);
+            diagnostics.ReportUnexpectedToken(Current.Span, Current.Kind, kind);
+            return new SyntaxToken(kind, null, null, pos);
         }
 
         private void SyntaxParse()
@@ -75,7 +81,7 @@ namespace Nerin.Analyzers
             }
 
             Lexer lexer = new Lexer(text);
-            SyntaxToken current = new SyntaxToken(TokensKind.Space, null, null);
+            SyntaxToken current = new SyntaxToken(TokensKind.Space, null, null, pos);
 
             while (current.Kind != TokensKind.End && current.Kind != TokensKind.Bad)
             {
@@ -86,38 +92,57 @@ namespace Nerin.Analyzers
                     tokens.Add(current);
                 }
             }
+
+            diagnostics.AddRange(lexer.Diagnostics);
         }
 
         public CompilationUnit Parse()
         {
             Statement statement = ParseStatement();
-            return new CompilationUnit(statement);
+            SyntaxToken end = Match(TokensKind.End);
+            return new CompilationUnit(statement, end);
         }
 
         private Statement ParseStatement()
         {
-            if (Current.Kind == TokensKind.OpenBrace)
-            {
-                return ParseBlockExpr();
-            }
 
-            return ParseExprStatement();
+            switch (Current.Kind)
+            {
+                case TokensKind.OpenBrace:
+                    return ParseBlockExpr();
+
+                case TokensKind.LetKeyword:
+                case TokensKind.VarKeyword:
+                    return ParseVariableDeclaration();
+
+                default:
+                    return ParseExprStatement();
+            }
+        }
+
+        private Statement ParseVariableDeclaration()
+        {
+            TokensKind expected = Current.Kind == TokensKind.LetKeyword ? TokensKind.LetKeyword : TokensKind.VarKeyword;
+            SyntaxToken keyword = Match(expected);
+            SyntaxToken identifier = Match(TokensKind.Name);
+            SyntaxToken equals = Match(TokensKind.Assigment);
+            Expr expr = ParseExpr();
+
+            return new VariableDeclarationStatement(keyword, identifier, equals, expr);
         }
 
         private Statement ParseBlockExpr()
         {
-            SyntaxToken openBrace = Current;
-            NextToken();
+            SyntaxToken openBrace = Match(TokensKind.OpenBrace);
             ImmutableArray<Statement>.Builder statements = ImmutableArray.CreateBuilder<Statement>();
 
-            while (Current.Kind != TokensKind.End || Current.Kind != TokensKind.CloseBrace)
+            while (Current.Kind != TokensKind.End && Current.Kind != TokensKind.CloseBrace)
             {
                 Statement statement = ParseStatement();
                 statements.Add(statement);
             }
 
-            SyntaxToken closeBrace = Current;
-            NextToken();
+            SyntaxToken closeBrace = Match(TokensKind.CloseBrace);
 
             return new BlockStatement(openBrace, statements.ToImmutable(), closeBrace);
         }
@@ -135,21 +160,20 @@ namespace Nerin.Analyzers
 
         private Expr ParseAssigment()
         {
-            if (Current.Kind == TokensKind.Name && 
+            if (Current.Kind == TokensKind.Name &&
                 Peek(1).Kind == TokensKind.Assigment)
             {
                 SyntaxToken variable = NextToken();
                 SyntaxToken assigmentToken = NextToken();
                 Expr assigmentExpr = ParseAssigment();
-                
+
                 return new AssigmentExpr(variable, assigmentToken, assigmentExpr);
             }
 
-            Expr left = ParseBinary();
-            return left;
+            return ParseBinary();
         }
 
-        public Expr ParseBinary(int parentPriority = 0)
+        private Expr ParseBinary(int parentPriority = 0)
         {
             Expr left;
             int unaryPriority = Current.Kind.GetUnaryOperatorPriority();
@@ -165,8 +189,7 @@ namespace Nerin.Analyzers
             else
             {
                 left = ParsePrimary();
-            } 
-                
+            }
 
             while (true)
             {
@@ -188,35 +211,50 @@ namespace Nerin.Analyzers
 
         private Expr ParsePrimary()
         {
-            if (Current.Kind == TokensKind.LeftBracket)
+            switch (Current.Kind)
             {
-                SyntaxToken left = NextToken();
-                Expr expr = ParseExpr();
-                SyntaxToken right = Match(TokensKind.RightBracket);
+                case TokensKind.LeftBracket:
+                    return ParseBrackets();
 
-                return new BracketsExpr(left, right, expr);
+                case TokensKind.TrueValue:
+                case TokensKind.FalseValue:
+                    return ParseBoolLiteral();
+
+                case TokensKind.Number:
+                    return ParseIntLiteral();
+
+                case TokensKind.Name:
+                default:
+                    return ParseName();
             }
+        }
 
-            else if (Current.Kind == TokensKind.TrueValue || 
-                     Current.Kind == TokensKind.FalseValue)
-            {
-                return new LiteralExpr(NextToken());
-            }
+        private Expr ParseBrackets()
+        {
+            SyntaxToken left = Match(TokensKind.LeftBracket);
+            Expr expr = ParseExpr();
+            SyntaxToken right = Match(TokensKind.RightBracket);
 
-            else if (Current.Kind == TokensKind.Name)
-            {
-                SyntaxToken variable = NextToken();
-                if (Current.Kind == TokensKind.Assigment)
-                {
-                    SyntaxToken assigment = NextToken();
+            return new BracketsExpr(left, right, expr);
+        }
 
-                }
-                return new NameExpr(variable);
-            }
+        private Expr ParseBoolLiteral()
+        {
+            bool isTrue = Current.Kind == TokensKind.TrueValue;
+            SyntaxToken token = isTrue ? Match(TokensKind.TrueValue) : Match(TokensKind.FalseValue);
+            return new LiteralExpr(token);
+        }
 
+        private Expr ParseIntLiteral()
+        {
             SyntaxToken number = Match(TokensKind.Number);
-
             return new LiteralExpr(number);
+        }
+
+        private Expr ParseName()
+        {
+            SyntaxToken name = Match(TokensKind.Name);
+            return new NameExpr(name);
         }
     }
 }

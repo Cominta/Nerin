@@ -1,4 +1,5 @@
 ﻿using Nerin.Analyzers.Binder.Items;
+using NerinLib.Diagnostics;
 using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
@@ -55,13 +56,15 @@ namespace NerinLib.Analyzers.Binder
     {
         public BoundGlobalScope Previous { get; }
         public ImmutableArray<VariableSymbol> Variables;
+        public ImmutableArray<Diagnostic> Diagnostics { get; }
         public BoundStatement Statement;
 
-        public BoundGlobalScope(BoundGlobalScope previous, ImmutableArray<VariableSymbol> vars, BoundStatement statement)
+        public BoundGlobalScope(BoundGlobalScope previous, ImmutableArray<Diagnostic> diagnostics, ImmutableArray<VariableSymbol> vars, BoundStatement statement)
         {
             Previous = previous;
             Variables = vars;
             Statement = statement;
+            Diagnostics = diagnostics;
         }
     }
 }
