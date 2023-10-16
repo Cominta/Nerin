@@ -123,6 +123,22 @@ namespace Nerin.Analyzers.Binder.Items
             // != (int)
             new BoundBinaryOperator(TokensKind.NotEqual, BoundBinaryOperatorKind.LogicalNotEqual,
                                     typeof(int), typeof(bool)),
+
+            // < (int)
+            new BoundBinaryOperator(TokensKind.Less, BoundBinaryOperatorKind.Less,
+                                    typeof(int), typeof(int)),
+
+            // > (int)
+            new BoundBinaryOperator(TokensKind.Greater, BoundBinaryOperatorKind.Greater,
+                                    typeof(int), typeof(int)),
+
+            // <= (int)
+            new BoundBinaryOperator(TokensKind.LessOrEqual, BoundBinaryOperatorKind.LessOrEqual,
+                                    typeof(int), typeof(int)),
+
+            // >= (int)
+            new BoundBinaryOperator(TokensKind.GreaterOrEqual, BoundBinaryOperatorKind.GreaterOrEqual,
+                                    typeof(int), typeof(int)),
         };
 
         public static BoundBinaryOperator Bind(TokensKind kind, Type leftType, Type rightType)

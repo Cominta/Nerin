@@ -173,6 +173,40 @@ namespace Nerin.Analyzers
 
                     break;
 
+                case '<':
+                    if (Peek(1) == '=')
+                    {
+                        pos += 2;
+                        kind = TokensKind.LessOrEqual;
+                        value = null;
+                    }
+
+                    else
+                    {
+                        NextPos();
+                        kind = TokensKind.Less;
+                        value = null;
+                    }
+
+                    break;
+
+                case '>':
+                    if (Peek(1) == '=')
+                    {
+                        pos += 2;
+                        kind = TokensKind.GreaterOrEqual;
+                        value = null;
+                    }
+
+                    else
+                    {
+                        NextPos();
+                        kind = TokensKind.Greater;
+                        value = null;
+                    }
+
+                    break;
+
                 case '0':
                 case '1':
                 case '2':

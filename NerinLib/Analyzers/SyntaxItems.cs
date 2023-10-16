@@ -27,6 +27,10 @@ namespace Nerin.Analyzers.Items
         Assigment,
         LetKeyword,
         VarKeyword,
+        LessOrEqual,
+        Less,
+        GreaterOrEqual,
+        Greater,
 
         Plus,
         Minus,

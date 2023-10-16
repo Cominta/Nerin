@@ -23,6 +23,10 @@ namespace Nerin.Analyzers
 
                 case TokensKind.Equal:
                 case TokensKind.NotEqual:
+                case TokensKind.Greater:
+                case TokensKind.Less:
+                case TokensKind.LessOrEqual: 
+                case TokensKind.GreaterOrEqual:
                     return 3;
 
                 case TokensKind.And:

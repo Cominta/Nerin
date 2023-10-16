@@ -100,10 +100,15 @@ namespace Nerin.Analyzers.Binder.Items
         Multiplication,
         Division,
 
-        LogicalAnd, // &&
-        LogicalOr, // ||
-        LogicalEqual, // ==
-        LogicalNotEqual, // !=
+        LogicalAnd,     // &&
+        LogicalOr,      // ||
+        LogicalEqual,   // ==
+        LogicalNotEqual,// !=
+
+        Less,           // <
+        Greater,        // >
+        LessOrEqual,    // <=
+        GreaterOrEqual  // >=
     }
 
     class BoundBinaryExpr : BoundExpr
