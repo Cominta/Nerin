@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -42,11 +43,11 @@ namespace Nerin.NerinIDE
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1067, 588);
+            this.ClientSize = new System.Drawing.Size(966, 588);
             this.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            //this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "NideMain";
             this.Text = "NiDE";
             this.ResumeLayout(false);
@@ -55,6 +56,7 @@ namespace Nerin.NerinIDE
 
         private void SetConsole(StringBuilder resultBuilder)
         {
+            //To receive data from NideMain class 
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NideMain));
 
             Form ConsoleWindow = new Form();
@@ -80,35 +82,56 @@ namespace Nerin.NerinIDE
             ConsoleWindow.ShowDialog();
         }
 
-        private void ShowSettingsDialog()
+        private void ShowSettings()
         {
             Form Settings = new Form();
             Settings.Text = "Settings";
-            Settings.Size = new Size(300, 200);
+            Settings.BackColor = Color.FromArgb(38, 38, 38);
+            Settings.Size = new Size(300, 300);
+            Settings.FormBorderStyle = FormBorderStyle.FixedSingle;
             Settings.StartPosition = FormStartPosition.CenterParent;
 
-            TextBox FontTextBox = new TextBox();
-            FontTextBox.Text = MainWindow.Font.Size.ToString();
-            FontTextBox.Location = new Point(20, 20);
+            Label FontLabel = new Label();
+            FontLabel.Text = "Font size:";
+            FontLabel.ForeColor = Color.White;
+            FontLabel.Location = new Point(20, 20);
+
+            NumericUpDown Font = new NumericUpDown();
+            Font.Minimum = 5;
+            Font.Maximum = 40;
+            Font.Value = (decimal)MainWindow.Font.Size;
+            Font.Location = new Point(150, 20);
+
+            Label WidthLabel = new Label();
+            WidthLabel.Text = "Window width:";
+            WidthLabel.ForeColor = Color.White;
+            WidthLabel.Location = new Point(20, 60);
 
             NumericUpDown WidthNumericUpDown = new NumericUpDown();
-            WidthNumericUpDown.Minimum = 100;
-            WidthNumericUpDown.Maximum = 2000; 
+            WidthNumericUpDown.Minimum = 320;
+            WidthNumericUpDown.Maximum = 7680;
             WidthNumericUpDown.Value = this.Width;
-            WidthNumericUpDown.Location = new Point(20, 60);
+            WidthNumericUpDown.Location = new Point(150, 60);
+
+            Label HeightLabel = new Label();
+            HeightLabel.Text = "Window height:";
+            HeightLabel.ForeColor = Color.White;
+            HeightLabel.Location = new Point(20, 100);
 
             NumericUpDown HeightNumericUpDown = new NumericUpDown();
-            HeightNumericUpDown.Minimum = 100;
-            HeightNumericUpDown.Maximum = 2000;
+            HeightNumericUpDown.Minimum = 240;
+            HeightNumericUpDown.Maximum = 4320;
             HeightNumericUpDown.Value = this.Height;
-            HeightNumericUpDown.Location = new Point(20, 100);
+            HeightNumericUpDown.Location = new Point(150, 100);
 
             Button Apply = new Button();
             Apply.Text = "Apply";
-            Apply.Location = new Point(20, 140);
+            Apply.ForeColor = Color.Black;
+            Apply.BackColor = Color.Gray;
+            Apply.Location = new Point(100, 150);
             Apply.Click += (s, e) =>
             {
-                if (float.TryParse(FontTextBox.Text, out float fontSize))
+                if (float.TryParse(Font.Value.ToString(), out float fontSize))
                 {
                     MainWindow.Font = new Font(MainWindow.Font.FontFamily, fontSize);
                 }
@@ -118,13 +141,37 @@ namespace Nerin.NerinIDE
                 Settings.Close();
             };
 
-            Settings.Controls.Add(FontTextBox);
+            Apply.MouseEnter += Apply_MouseEnter;
+            Apply.MouseLeave += Apply_MouseLeave;
+
+            Settings.Controls.Add(FontLabel);
+            Settings.Controls.Add(Font);
+            Settings.Controls.Add(WidthLabel);
             Settings.Controls.Add(WidthNumericUpDown);
+            Settings.Controls.Add(HeightLabel);
             Settings.Controls.Add(HeightNumericUpDown);
             Settings.Controls.Add(Apply);
 
-
             Settings.ShowDialog();
+        }
+
+        public delegate void EventHandler(object sender, EventArgs e);
+
+
+        private void Apply_MouseEnter(object sender, EventArgs e)
+        {
+            if (sender is Button applyButton)
+            {
+                applyButton.BackColor = Color.FromArgb(100, 100, 100);
+            }
+        }
+
+        private void Apply_MouseLeave(object sender, EventArgs e)
+        {
+            if (sender is Button applyButton)
+            {
+                applyButton.BackColor = Color.Gray;
+            }
         }
 
         #endregion
