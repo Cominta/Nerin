@@ -12,6 +12,7 @@ using NerinLib;
 using NerinLib.Symbols;
 using System.Runtime.InteropServices.WindowsRuntime;
 using NerinLib.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Nerin.Analyzers.Binder
 {
@@ -84,6 +85,9 @@ namespace Nerin.Analyzers.Binder
                 case TokensKind.IfStatement:
                     return BindIfStatement((IfStatement)statement);
 
+                case TokensKind.WhileStatement:
+                    return BindWhileStatement((WhileStatement)statement);
+
                 case TokensKind.ExpressionStatement:
                     return BindExpressionStatement((ExprStatement)statement);
 
@@ -111,6 +115,14 @@ namespace Nerin.Analyzers.Binder
             }
 
             return new BoundVariableDeclarationStatement(symbol, initializer);
+        }
+
+        private BoundWhileStatement BindWhileStatement(WhileStatement statement)
+        {
+            BoundExpr condition = BindExpr(statement.Condition, typeof(bool));
+            BoundStatement body = BindStatement(statement.Body);
+
+            return new BoundWhileStatement(condition, body);
         }
 
         private BoundStatement BindIfStatement(IfStatement statement)

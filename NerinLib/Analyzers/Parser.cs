@@ -118,6 +118,9 @@ namespace Nerin.Analyzers
                 case TokensKind.IfKeyword:
                     return ParseIfStatement();
 
+                case TokensKind.WhileKeyword:
+                    return ParseWhileStatement();
+
                 default:
                     return ParseExprStatement();
             }
@@ -132,6 +135,15 @@ namespace Nerin.Analyzers
             Expr expr = ParseExpr();
 
             return new VariableDeclarationStatement(keyword, identifier, equals, expr);
+        }
+
+        private Statement ParseWhileStatement()
+        {
+            SyntaxToken keyword = Match(TokensKind.WhileKeyword);
+            Expr condition = ParseExpr();
+            Statement body = ParseStatement();
+
+            return new WhileStatement(keyword, condition, body);
         }
 
         private Statement ParseIfStatement()

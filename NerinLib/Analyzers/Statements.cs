@@ -88,4 +88,20 @@ namespace NerinLib.Analyzers.Statements
             Then = then;
         }
     }
+
+    public class WhileStatement : Statement
+    {
+        public override TokensKind Kind => TokensKind.WhileStatement;
+
+        public SyntaxToken Keyword { get; }
+        public Expr Condition { get; }
+        public Statement Body { get; }
+
+        public WhileStatement(SyntaxToken keyword, Expr condition, Statement body)
+        {
+            Keyword = keyword;
+            Condition = condition;
+            Body = body;
+        }
+    }
 }

@@ -42,6 +42,10 @@ namespace Nerin
                     EvaluateVariableDeclarationStatement((BoundVariableDeclarationStatement)statement);
                     break;
 
+                case BoundNodeKind.WhileStatement:
+                    EvaluateWhileStatement((BoundWhileStatement)statement);
+                    break;
+
                 case BoundNodeKind.IfStatement:
                     EvaluateIfStatement((BoundIfStatement)statement);
                     break;
@@ -73,6 +77,14 @@ namespace Nerin
             object value = EvaluateExpr(statement.Initializer);
             Variables[statement.Variable] = value;
             lastValue = value;
+        }
+
+        private void EvaluateWhileStatement(BoundWhileStatement statement)
+        {
+            while ((bool)EvaluateExpr(statement.Condition))
+            {
+                EvaluateStatement(statement.Body);
+            }
         }
 
         private void EvaluateIfStatement(BoundIfStatement statement)

@@ -33,6 +33,7 @@ namespace Nerin.Analyzers.Items
         Greater,
         IfKeyword,
         ElseKeyword,
+        WhileKeyword,
 
         Plus,
         Minus,
@@ -54,7 +55,8 @@ namespace Nerin.Analyzers.Items
         ExpressionStatement,
         VariableDeclarationStatement,
         IfStatement,
-        ElseStatement
+        ElseStatement,
+        WhileStatement
     }
 
     // Low-level token

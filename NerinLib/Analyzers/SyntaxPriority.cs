@@ -76,6 +76,9 @@ namespace Nerin.Analyzers
                 case "else":
                     return TokensKind.ElseKeyword;
 
+                case "while":
+                    return TokensKind.WhileKeyword;
+
                 default:
                     return TokensKind.Name;
             }
