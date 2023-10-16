@@ -115,6 +115,9 @@ namespace Nerin.Analyzers
                 case TokensKind.VarKeyword:
                     return ParseVariableDeclaration();
 
+                case TokensKind.IfKeyword:
+                    return ParseIfStatement();
+
                 default:
                     return ParseExprStatement();
             }
@@ -129,6 +132,29 @@ namespace Nerin.Analyzers
             Expr expr = ParseExpr();
 
             return new VariableDeclarationStatement(keyword, identifier, equals, expr);
+        }
+
+        private Statement ParseIfStatement()
+        {
+            SyntaxToken keyword = Match(TokensKind.IfKeyword);
+            Expr condition = ParseExpr();
+            Statement statement = ParseStatement();
+            ElseStatement elseStatement = ParseElseStatement();
+
+            return new IfStatement(keyword, condition, statement, elseStatement);
+        }
+
+        private ElseStatement ParseElseStatement()
+        {
+            if (Current.Kind != TokensKind.ElseKeyword)
+            {
+                return null;
+            }
+
+            SyntaxToken keyword = Match(TokensKind.ElseKeyword);
+            Statement statement = ParseStatement();
+
+            return new ElseStatement(keyword, statement);
         }
 
         private Statement ParseBlockExpr()

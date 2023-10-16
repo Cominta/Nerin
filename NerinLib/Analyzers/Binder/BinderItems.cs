@@ -20,7 +20,8 @@ namespace Nerin.Analyzers.Binder.Items
 
         BlockStatement,
         ExprStatement,
-        VariableDeclarationStatement
+        VariableDeclarationStatement,
+        IfStatement
     }
 
     public abstract class BoundNode
@@ -165,6 +166,22 @@ namespace Nerin.Analyzers.Binder.Items
         {
             Variable = variable;
             Initializer = initializer;
+        }
+    }
+
+    public class BoundIfStatement : BoundStatement
+    {
+        public override BoundNodeKind Kind => BoundNodeKind.IfStatement;
+
+        public BoundExpr Condition { get; }
+        public BoundStatement Then { get; }
+        public BoundStatement ElseStatement { get; }
+
+        public BoundIfStatement(BoundExpr condition,  BoundStatement then, BoundStatement elseStatement)
+        {
+            Condition = condition;
+            Then = then;
+            ElseStatement = elseStatement;
         }
     }
 }

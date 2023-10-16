@@ -70,6 +70,12 @@ namespace Nerin.Analyzers
                 case "let":
                     return TokensKind.LetKeyword;
 
+                case "if":
+                    return TokensKind.IfKeyword;
+
+                case "else":
+                    return TokensKind.ElseKeyword;
+
                 default:
                     return TokensKind.Name;
             }

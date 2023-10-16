@@ -81,6 +81,9 @@ namespace Nerin.Analyzers.Binder
                 case TokensKind.VariableDeclarationStatement:
                     return BindVariableDeclarationStatement((VariableDeclarationStatement)statement);
 
+                case TokensKind.IfStatement:
+                    return BindIfStatement((IfStatement)statement);
+
                 case TokensKind.ExpressionStatement:
                     return BindExpressionStatement((ExprStatement)statement);
 
@@ -110,6 +113,15 @@ namespace Nerin.Analyzers.Binder
             return new BoundVariableDeclarationStatement(symbol, initializer);
         }
 
+        private BoundStatement BindIfStatement(IfStatement statement)
+        {
+            BoundExpr condition = BindExpr(statement.Condition, typeof(bool));
+            BoundStatement ifStatement = BindStatement(statement.Then);
+            BoundStatement elseStatement = statement.Else == null ? null : BindStatement(statement.Else.Then);
+
+            return new BoundIfStatement(condition, ifStatement, elseStatement);
+        }
+
         private BoundBlockStatement BindBlockStatement(BlockStatement statement)
         {
             ImmutableArray<BoundStatement>.Builder statements = ImmutableArray.CreateBuilder<BoundStatement>();
@@ -124,6 +136,18 @@ namespace Nerin.Analyzers.Binder
             Scope = Scope.Parent;
 
             return new BoundBlockStatement(statements.ToImmutable());
+        }
+
+        private BoundExpr BindExpr(Expr expr, Type targetType)
+        {
+            BoundExpr result = BindExpr(expr);
+
+            if (result.Type != targetType)
+            {
+                diagnostics.ReportCannotConvert(expr.Span, result.Type, targetType);
+            }
+
+            return result;
         }
 
         private BoundExpr BindExpr(Expr expr)

@@ -1,6 +1,7 @@
 ﻿using Nerin.Analyzers;
 using Nerin.Analyzers.Binder.Items;
 using NerinLib;
+using NerinLib.Analyzers.Statements;
 using NerinLib.Symbols;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,10 @@ namespace Nerin
                     EvaluateVariableDeclarationStatement((BoundVariableDeclarationStatement)statement);
                     break;
 
+                case BoundNodeKind.IfStatement:
+                    EvaluateIfStatement((BoundIfStatement)statement);
+                    break;
+
                 case BoundNodeKind.ExprStatement:
                     EvaluateExprStatement((BoundExprStatement)statement);
                     break;
@@ -68,6 +73,21 @@ namespace Nerin
             object value = EvaluateExpr(statement.Initializer);
             Variables[statement.Variable] = value;
             lastValue = value;
+        }
+
+        private void EvaluateIfStatement(BoundIfStatement statement)
+        {
+            bool condition = (bool)EvaluateExpr(statement.Condition);
+
+            if (condition)
+            {
+                EvaluateStatement(statement.Then);
+            }
+
+            else if (statement.ElseStatement != null)
+            {
+                EvaluateStatement(statement.ElseStatement);
+            }
         }
 
         private void EvaluateExprStatement(BoundExprStatement statement)
@@ -171,6 +191,18 @@ namespace Nerin
 
                 case BoundBinaryOperatorKind.LogicalNotEqual:
                     return !Equals(left, right);
+
+                case BoundBinaryOperatorKind.Less:
+                    return (int)left < (int)right;
+
+                case BoundBinaryOperatorKind.Greater:
+                    return (int)left > (int)right;
+
+                case BoundBinaryOperatorKind.LessOrEqual:
+                    return (int)left <= (int)right;
+
+                case BoundBinaryOperatorKind.GreaterOrEqual:
+                    return (int)left >= (int)right;
             }
 
             throw new Exception();

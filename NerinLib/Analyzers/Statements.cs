@@ -56,4 +56,36 @@ namespace NerinLib.Analyzers.Statements
             Initializer = initializer;
         }
     }
+
+    public class IfStatement : Statement
+    {
+        public override TokensKind Kind => TokensKind.IfStatement;
+
+        public SyntaxToken IfKeyword { get; }
+        public Expr Condition { get; }
+        public Statement Then { get; }
+        public ElseStatement Else { get; }
+
+        public IfStatement(SyntaxToken ifKeyword, Expr condition, Statement then, ElseStatement _else)
+        {
+            IfKeyword = ifKeyword;
+            Condition = condition;
+            Then = then;
+            Else = _else;
+        }
+    }
+
+    public class ElseStatement : Syntax
+    {
+        public override TokensKind Kind => TokensKind.ElseStatement;
+
+        public SyntaxToken ElseKeyword { get; }
+        public Statement Then { get; }
+
+        public ElseStatement(SyntaxToken elseKeyword, Statement then)
+        {
+            ElseKeyword = elseKeyword;
+            Then = then;
+        }
+    }
 }

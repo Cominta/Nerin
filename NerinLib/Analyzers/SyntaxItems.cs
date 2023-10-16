@@ -31,6 +31,8 @@ namespace Nerin.Analyzers.Items
         Less,
         GreaterOrEqual,
         Greater,
+        IfKeyword,
+        ElseKeyword,
 
         Plus,
         Minus,
@@ -50,7 +52,9 @@ namespace Nerin.Analyzers.Items
         CompilationUnit,
         BlockStatement,
         ExpressionStatement,
-        VariableDeclarationStatement
+        VariableDeclarationStatement,
+        IfStatement,
+        ElseStatement
     }
 
     // Low-level token
@@ -60,7 +64,7 @@ namespace Nerin.Analyzers.Items
         public string Text { get; }
         public object Value { get; }
         public int Pos { get; }
-        public TextSpan Span => new TextSpan(Pos, Text?.Length ?? 0);
+        public override TextSpan Span => new TextSpan(Pos, Text?.Length ?? 0);
 
         public SyntaxToken(TokensKind kind, string text, object value, int pos)
         {
@@ -78,6 +82,7 @@ namespace Nerin.Analyzers.Items
 
     public abstract class Syntax
     {
+        public virtual TextSpan Span { get; }
         public abstract TokensKind Kind { get; }
     }
 
