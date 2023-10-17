@@ -100,6 +100,8 @@ namespace Nerin.NerinIDE
             Save.MouseLeave += Save_MouseLeave;
 
             Settings.Click += Settings_Click;
+            Settings.MouseEnter += Settings_MouseEnter;
+            Settings.MouseLeave += Settings_MouseLeave;
 
             MainWindow.TextChanged += Console_TextChanged;
             MainWindow.TextChanged += MainWindow_TextChanged;
@@ -171,21 +173,35 @@ namespace Nerin.NerinIDE
         private void Compile_MouseEnter(object sender, EventArgs e)
         {
             Compile.BackColor = Color.FromArgb(100, 100, 100);
+            Compile.Cursor = Cursors.Hand;
         }
 
         private void Compile_MouseLeave(object sender, EventArgs e)
         {
             Compile.BackColor = Color.FromArgb(67, 67, 67); // start color
+            Compile.Cursor = Cursors.Default;
         }
 
         private void Save_MouseEnter(object sender, EventArgs e)
         {
             Save.BackColor = Color.FromArgb(100, 100, 100);
+            Save.Cursor = Cursors.Hand;
         }
 
         private void Save_MouseLeave(object sender, EventArgs e)
         {
             Save.BackColor = Color.FromArgb(67, 67, 67); // start color
+            Save.Cursor = Cursors.Default;
+        }
+
+        private void Settings_MouseEnter(object sender, EventArgs e)
+        {
+            Settings.Cursor = Cursors.Hand;
+        }
+
+        private void Settings_MouseLeave(object sender, EventArgs e)
+        {
+            Settings.Cursor = Cursors.Default;
         }
 
         private void Console_TextChanged(object sender, EventArgs e)
