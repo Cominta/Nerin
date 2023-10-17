@@ -13,6 +13,9 @@ using NerinLib.Symbols;
 using NerinLib.Analyzers;
 using System.ComponentModel;
 using Nerin.NiDE;
+using System.Linq;
+using System.Threading.Tasks;
+
 
 namespace Nerin.NerinIDE
 {
@@ -28,6 +31,7 @@ namespace Nerin.NerinIDE
         private Creator creator = new Creator();
 
         private string _inputText = "";
+        private string error_txt = "";
         private bool error = false;
 
         public string GetText()
@@ -50,7 +54,7 @@ namespace Nerin.NerinIDE
             TableLayoutPanel mainTable = new TableLayoutPanel();
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Controls.Add(mainTable);
-            
+
             mainTable.Dock = DockStyle.Fill;
             mainTable.CellBorderStyle = TableLayoutPanelCellBorderStyle.None;
             mainTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
@@ -94,7 +98,7 @@ namespace Nerin.NerinIDE
             //Save.Click += Save_Click;
             Save.MouseEnter += Save_MouseEnter;
             Save.MouseLeave += Save_MouseLeave;
-            
+
             Settings.Click += Settings_Click;
 
             MainWindow.TextChanged += Console_TextChanged;
@@ -112,7 +116,7 @@ namespace Nerin.NerinIDE
             }
             else if (e.Control && e.KeyCode == Keys.F5 && error)
             {
-                MessageBox.Show("The program cannot be compiled because the code contains errors", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(error_txt, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -120,7 +124,7 @@ namespace Nerin.NerinIDE
         {
             if (error)
             {
-                MessageBox.Show("The program cannot be compiled because the code contains errors", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(error_txt, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
@@ -132,7 +136,7 @@ namespace Nerin.NerinIDE
         {
             ShowSettings();
         }
-        
+
         private void ShowConsole()
         {
             string[] lines = GetText().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
@@ -144,12 +148,21 @@ namespace Nerin.NerinIDE
             foreach (string line in lines)
             {
                 SyntaxTree tree = SyntaxTree.Parse(line);
+
+                if (!string.IsNullOrWhiteSpace(line) && tree.Diagnostics.Any())
+                {
+                    continue;
+                }
+
                 Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                 EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
-                string lineResult = resultBound.Value.ToString();
-
-                resultBuilder.AppendLine(lineResult);
+                if(!tree.Diagnostics.Any())
+                {
+                    string lineResult = resultBound.Value.ToString();
+                    resultBuilder.AppendLine(lineResult);
+                    previous = compilation;
+                }
             }
 
             SetConsole(resultBuilder);
@@ -194,8 +207,8 @@ namespace Nerin.NerinIDE
 
             try
             {
-                string[] lines = MainWindow.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                Parser parser = new Parser();
+                string[] lines = GetText().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                StringBuilder resultBuilder = new StringBuilder();
 
                 Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
                 Compilation previous = null;
@@ -203,10 +216,21 @@ namespace Nerin.NerinIDE
                 foreach (string line in lines)
                 {
                     SyntaxTree tree = SyntaxTree.Parse(line);
+
+                    if (!string.IsNullOrWhiteSpace(line) && tree.Diagnostics.Any())
+                    {
+                        continue;
+                    }
+
                     Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                     EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
-                    string lineResult = resultBound.Value.ToString();
+                    if (!tree.Diagnostics.Any())
+                    {
+                        string lineResult = resultBound.Value.ToString();
+                        resultBuilder.AppendLine(lineResult);
+                        previous = compilation;
+                    }
                 }
 
                 MainWindow.ForeColor = Color.FromArgb(255, 255, 255);
@@ -214,8 +238,10 @@ namespace Nerin.NerinIDE
             }
             catch (Exception ex)
             {
-                MainWindow.ForeColor = Color.Red;
+                error_txt = ex.Message;
                 error = true;
+                MainWindow.ForeColor = Color.Red;
+                
             }
         }
 
