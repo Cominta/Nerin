@@ -22,7 +22,7 @@ namespace NerinLib
     {
         public SyntaxTree Tree { get; }
         public Compilation Previous { get; }
-        private BoundGlobalScope globalScope;
+        private BoundGlobalScope globalScope;  
 
         public Compilation(SyntaxTree tree) 
             : this(null, tree)
@@ -94,4 +94,6 @@ namespace NerinLib
             End = end;
         }
     }
+
+    
 }
