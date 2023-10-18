@@ -77,6 +77,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NiDE\Creator.cs" />
+    <Compile Include="NiDE\FindDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="NiDE\NerinMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,6 +105,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="NiDE\FindDialog.resx">
+      <DependentUpon>FindDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NiDE\NerinMain.resx">
       <DependentUpon>NerinMain.cs</DependentUpon>
     </EmbeddedResource>

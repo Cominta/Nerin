@@ -22,11 +22,14 @@ namespace Nerin.NerinIDE
     public partial class NideMain : Form
     {
         private TextBox MainWindow;
+        private TextBox MainTextBox;
 
         private Button Compile;
         private Button Save;
 
         private PictureBox Settings;
+
+        private FindDialog findDialog;
 
         private Creator creator = new Creator();
 
@@ -64,19 +67,20 @@ namespace Nerin.NerinIDE
             mainTable.Controls.Add(topPanel, 0, 0);
 
             //mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            TextBox mainTextBox = new TextBox();
-            mainTextBox.Multiline = true;
-            mainTextBox.ScrollBars = ScrollBars.Both;
-            mainTextBox.Dock = DockStyle.Fill;
-            mainTextBox.BorderStyle = BorderStyle.None;
-            mainTable.Controls.Add(mainTextBox, 0, 1);
 
-            MainWindow = mainTextBox;
+            MainTextBox = new TextBox();
+            MainTextBox.Multiline = true;
+            MainTextBox.ScrollBars = ScrollBars.Both;
+            MainTextBox.Dock = DockStyle.Fill;
+            MainTextBox.BorderStyle = BorderStyle.None;
+            mainTable.Controls.Add(MainTextBox, 0, 1);
 
-            Compile = creator.CreateButton("Compile", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, mainTextBox.Width - 100, 10);
+            MainWindow = MainTextBox;
+
+            Compile = creator.CreateButton("Compile", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Right, MainTextBox.Width - 100, 10);
             topPanel.Controls.Add(Compile);
 
-            Save = creator.CreateButton("Save", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Left, mainTextBox.Width - 900, 10);
+            Save = creator.CreateButton("Save", Color.White, Color.FromArgb(67, 67, 67), AnchorStyles.Top | AnchorStyles.Left, MainTextBox.Width - 900, 10);
             topPanel.Controls.Add(Save);
 
             Image settings = Properties.Resources.settings; //path to image "settings"
@@ -85,8 +89,8 @@ namespace Nerin.NerinIDE
             topPanel.Controls.Add(Settings);
 
             topPanel.BackColor = Color.FromArgb(38, 38, 38);
-            mainTextBox.BackColor = Color.FromArgb(67, 67, 67);
-            mainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
+            MainTextBox.BackColor = Color.FromArgb(67, 67, 67);
+            MainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
         }
 
         private void InitializeEventHandlers()
@@ -94,6 +98,10 @@ namespace Nerin.NerinIDE
             Compile.Click += Compile_Click;
             Compile.MouseEnter += Compile_MouseEnter;
             Compile.MouseLeave += Compile_MouseLeave;
+
+            Compile.TabStop = false;
+            Save.TabStop = false;
+            Settings.TabStop = false;
 
             //Save.Click += Save_Click;
             Save.MouseEnter += Save_MouseEnter;
@@ -105,12 +113,14 @@ namespace Nerin.NerinIDE
 
             MainWindow.TextChanged += Console_TextChanged;
             MainWindow.TextChanged += MainWindow_TextChanged;
+            MainWindow.PreviewKeyDown += MainWindow_PreviewKeyDown;
 
             this.KeyPreview = true;
-            this.KeyDown += NideMain_KeyDown;
+            this.KeyDown += NideMain_CtrlF5;
+            this.KeyDown += NideMain_CtrlF;
         }
 
-        private void NideMain_KeyDown(object sender, KeyEventArgs e)
+        private void NideMain_CtrlF5(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.F5 && !error)
             {
@@ -119,6 +129,28 @@ namespace Nerin.NerinIDE
             else if (e.Control && e.KeyCode == Keys.F5 && error)
             {
                 MessageBox.Show(error_txt, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void NideMain_CtrlF(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.F)
+            {
+                findDialog = new FindDialog();
+                findDialog.ShowDialog();
+            }
+        }
+
+        private void MainWindow_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Tab)
+            {
+                int cursorPosition = MainWindow.SelectionStart;
+                string spaces = new string(' ', 4);
+
+                MainWindow.Text = MainWindow.Text.Insert(cursorPosition, spaces);
+
+                MainWindow.SelectionStart = cursorPosition + 4;
             }
         }
 
@@ -141,7 +173,8 @@ namespace Nerin.NerinIDE
 
         private void ShowConsole()
         {
-            string[] lines = GetText().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string inputText = GetText();
+            string[] lines = inputText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             StringBuilder resultBuilder = new StringBuilder();
 
             Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
@@ -151,7 +184,7 @@ namespace Nerin.NerinIDE
             {
                 SyntaxTree tree = SyntaxTree.Parse(line);
 
-                if (!string.IsNullOrWhiteSpace(line) && tree.Diagnostics.Any())
+                if (string.IsNullOrWhiteSpace(line) || tree.Diagnostics.Any())
                 {
                     continue;
                 }
@@ -159,11 +192,18 @@ namespace Nerin.NerinIDE
                 Compilation compilation = previous == null ? new Compilation(tree) : previous.ContinueWith(tree);
                 EvaluationResult resultBound = compilation.EvaluateResult(variables);
 
-                if(!tree.Diagnostics.Any())
+                if (!tree.Diagnostics.Any())
                 {
                     string lineResult = resultBound.Value.ToString();
                     resultBuilder.AppendLine(lineResult);
                     previous = compilation;
+                }
+                else
+                {
+                    foreach (var diagnostic in tree.Diagnostics)
+                    {
+                        resultBuilder.AppendLine(diagnostic.ToString());
+                    }
                 }
             }
 
