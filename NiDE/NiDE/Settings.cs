@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NiDE.NiDE;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,8 +13,8 @@ namespace NiDE
 {
     public partial class Settings : Form
     {
-        private NideMain nideMain = new NideMain();
-        private NideMain MainTextBox = new NideMain();
+
+        public int theme = -1;
 
         public Settings()
         {
@@ -22,34 +23,42 @@ namespace NiDE
 
         private void Apply_Click(object sender, EventArgs e)
         {
-            if (float.TryParse(NumericFont.Value.ToString(), out float fontSize))
+            if (ThemeListBox.SelectedIndex != -1) 
             {
-                MainTextBox.Font = new Font(MainTextBox.Font.FontFamily, fontSize);
+                switch (ThemeListBox.SelectedIndex)
+                {
+                    case -1:
+                    case 0:
+                        theme = ThemeListBox.SelectedIndex;
+                        this.Close();
+                        break;
+
+                    case 1:
+                        theme = ThemeListBox.SelectedIndex;
+                        this.Close();
+                        break;
+                }
             }
-
-            nideMain.Width = (int)NumericWidth.Value;
-            nideMain.Height = (int)NumericHeight.Value;
-
-            this.Close();
         }
 
         private void Basic_Click(object sender, EventArgs e)
         {
-            MainTextBox.Font = new Font(MainTextBox.Font.FontFamily, 12);
-            nideMain.Width = 816;
-            nideMain.Height = 516;
 
-            this.Close();
         }
 
         private void NumericHeight_ValueChanged(object sender, EventArgs e)
         {
-            NumericHeight.Value = nideMain.Height;
+
         }
 
         private void NumericWidth_ValueChanged(object sender, EventArgs e)
         {
-            NumericWidth.Value = nideMain.Width;
+
+        }
+
+        private void ThemeListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

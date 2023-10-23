@@ -28,14 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NideMain));
             this.MainTextBox = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.Load = new System.Windows.Forms.Button();
+            this.load = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.Save = new System.Windows.Forms.Button();
             this.Compile = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -60,7 +62,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(35)))), ((int)(((byte)(35)))), ((int)(((byte)(35)))));
-            this.panel1.Controls.Add(this.Load);
+            this.panel1.Controls.Add(this.load);
             this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.Save);
             this.panel1.Controls.Add(this.Compile);
@@ -70,22 +72,22 @@
             this.panel1.Size = new System.Drawing.Size(800, 62);
             this.panel1.TabIndex = 2;
             // 
-            // Load
+            // load
             // 
-            this.Load.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.Load.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.Load.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.Load.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.Load.Font = new System.Drawing.Font("Malgun Gothic", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Load.Location = new System.Drawing.Point(156, 12);
-            this.Load.MaximumSize = new System.Drawing.Size(80, 32);
-            this.Load.MinimumSize = new System.Drawing.Size(80, 32);
-            this.Load.Name = "Load";
-            this.Load.Size = new System.Drawing.Size(80, 32);
-            this.Load.TabIndex = 3;
-            this.Load.TabStop = false;
-            this.Load.Text = "Load";
-            this.Load.UseVisualStyleBackColor = false;
+            this.load.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.load.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+            this.load.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.load.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.load.Font = new System.Drawing.Font("Malgun Gothic", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.load.Location = new System.Drawing.Point(156, 12);
+            this.load.MaximumSize = new System.Drawing.Size(80, 32);
+            this.load.MinimumSize = new System.Drawing.Size(80, 32);
+            this.load.Name = "load";
+            this.load.Size = new System.Drawing.Size(80, 32);
+            this.load.TabIndex = 3;
+            this.load.TabStop = false;
+            this.load.Text = "Load";
+            this.load.UseVisualStyleBackColor = false;
             // 
             // pictureBox1
             // 
@@ -145,6 +147,11 @@
             this.panel2.Size = new System.Drawing.Size(800, 3);
             this.panel2.TabIndex = 3;
             // 
+            // timer1
+            // 
+            this.timer1.Interval = 10;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // NideMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -158,6 +165,7 @@
             this.MinimumSize = new System.Drawing.Size(400, 200);
             this.Name = "NideMain";
             this.Text = "NiDE";
+            this.Load += new System.EventHandler(this.NideMain_Load);
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
@@ -177,7 +185,8 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button Save;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Button Load;
+        private System.Windows.Forms.Button load;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

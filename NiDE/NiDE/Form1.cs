@@ -14,12 +14,14 @@ using NerinLib.Analyzers;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using NiDE.NiDE;
 
 namespace NiDE
 {
     public partial class NideMain : Form
     {
         private Console console = new Console();
+        private ThemeControler controler = new ThemeControler();
         private Settings settings = new Settings();
 
         private string _inputText = "";
@@ -30,11 +32,6 @@ namespace NiDE
         public NideMain()
         {
             InitializeComponent();
-        }
-
-        public string GetText()
-        {
-            return _inputText;
         }
 
         private void Compile_Click(object sender, EventArgs e)
@@ -52,7 +49,21 @@ namespace NiDE
         //Settings
         private void pictureBox1_Click(object sender, EventArgs e)
         {
+            settings.ShowDialog();
 
+            switch (settings.theme)
+            {
+                case -1:
+                case 0:
+                    this.MainTextBox = controler.TextBoxClassicTheme(this);
+                    this.panel1 = controler.PanelClassicTheme(this);
+                    break;
+
+                case 1:
+                    this.MainTextBox = controler.TextBoxClassicLightTheme(this);
+                    this.panel1 = controler.PanelClassicLightTheme(this);
+                    break;
+            }
         }
 
         private void NideMain_CtrlF5(object sender, KeyEventArgs e)
@@ -166,6 +177,29 @@ namespace NiDE
             }
         }
 
-        
+        public string GetText()
+        {
+            return _inputText;
+        }
+
+        public TextBox GetTextBox() 
+        {
+            return this.MainTextBox;        
+        }
+
+        public Panel GetPanel()
+        {
+            return this.panel1;
+        }
+
+        private void NideMain_Load(object sender, EventArgs e)
+        {
+            timer1.Start();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            
+        }
     }
 }
