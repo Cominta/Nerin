@@ -16,23 +16,18 @@ using Nerin.NiDE;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace Nerin.NerinIDE
 {
     public partial class NideMain : Form
     {
-        private TextBox MainWindow;
+        private TabControl tabControl;
         private TextBox MainTextBox;
-
+        private TextBox MainWindow;
         private Button Compile;
         private Button Save;
-
         private PictureBox Settings;
-
         private FindDialog findDialog;
-
         private Creator creator = new Creator();
-
         private string _inputText = "";
         private string error_txt = "";
         private bool error = false;
@@ -66,14 +61,23 @@ namespace Nerin.NerinIDE
             topPanel.Dock = DockStyle.Fill;
             mainTable.Controls.Add(topPanel, 0, 0);
 
-            //mainTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            // Create a TabControl
+            tabControl = new TabControl();
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.Width = 100;
+            mainTable.Controls.Add(tabControl, 0, 1);
+
+            // Create a new tab page and add it to the tab control
+            TabPage tabPage = new TabPage("Code");
+            tabControl.TabPages.Add(tabPage);
+            tabPage.ForeColor = Color.Black;
 
             MainTextBox = new TextBox();
             MainTextBox.Multiline = true;
             MainTextBox.ScrollBars = ScrollBars.Both;
             MainTextBox.Dock = DockStyle.Fill;
             MainTextBox.BorderStyle = BorderStyle.None;
-            mainTable.Controls.Add(MainTextBox, 0, 1);
+            tabPage.Controls.Add(MainTextBox);
 
             MainWindow = MainTextBox;
 
@@ -138,6 +142,22 @@ namespace Nerin.NerinIDE
             {
                 findDialog = new FindDialog();
                 findDialog.ShowDialog();
+            }
+        }
+
+        private void SetCursorToText()
+        {
+            FindDialog findDialog = new FindDialog();
+            string searchText = findDialog.GetSearchText();
+
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                int textIndex = MainWindow.Text.IndexOf(searchText);
+                if (textIndex != -1)
+                {
+                    MainWindow.SelectionStart = textIndex;
+                    MainWindow.SelectionLength = searchText.Length;
+                }
             }
         }
 
