@@ -23,6 +23,8 @@ namespace NiDE
         private Console console = new Console();
         private ThemeControler controler = new ThemeControler();
         private Settings settings = new Settings();
+        private Saver saver;
+        private Loader loader = new Loader();
 
         private string _inputText = "";
         private string error_txt = "";
@@ -143,6 +145,7 @@ namespace NiDE
             }
 
             string[] lines = inputText.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
             StringBuilder resultBuilder = new StringBuilder();
 
             Dictionary<VariableSymbol, object> variables = new Dictionary<VariableSymbol, object>();
@@ -244,29 +247,20 @@ namespace NiDE
             return _inputText;
         }
 
-        public TextBox GetTextBox() 
+        private void Save_Click(object sender, EventArgs e)
         {
-            return this.MainTextBox;        
+            saver = new Saver(GetText());
+            saver.Save();
         }
 
-        public Panel GetPanel()
+        private void load_Click(object sender, EventArgs e)
         {
-            return this.panel1;
-        }
+            MainTextBox.Text = string.Empty;
 
-        public Button GetCompile()
-        {
-            return this.Compile;
-        }
+            List<string> result = loader.Load();
+            _inputText = string.Join("\r\n", result);
 
-        public Button GetSave()
-        {
-            return this.Save;
-        }
-
-        public Button GetLoad()
-        {
-            return this.load;
+            MainTextBox.Text = _inputText;
         }
 
         private void NideMain_Load(object sender, EventArgs e) { }

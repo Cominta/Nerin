@@ -75,6 +75,8 @@
     <Compile Include="NiDE\Console.Designer.cs">
       <DependentUpon>Console.cs</DependentUpon>
     </Compile>
+    <Compile Include="NiDE\Loader.cs" />
+    <Compile Include="NiDE\Saver.cs" />
     <Compile Include="NiDE\ThemeControler.cs" />
     <Compile Include="NiDE\Form1.cs">
       <SubType>Form</SubType>

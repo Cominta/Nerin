@@ -88,17 +88,12 @@ namespace NiDE
 
         private void Basic_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void NumericHeight_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void NumericWidth_ValueChanged(object sender, EventArgs e)
-        {
-
+            this.BackColor = Color.FromArgb(60, 60, 60);
+            Apply.BackColor = Color.FromArgb(192, 64, 0);
+            Basic.BackColor = Color.FromArgb(192, 64, 0);
+            panel1.BackColor = Color.FromArgb(37, 37, 37);
+            panel2.BackColor = Color.FromArgb(192, 64, 0);
+            panel3.BackColor = Color.FromArgb(192, 64, 0);
         }
 
         private void ThemeListBox_SelectedIndexChanged(object sender, EventArgs e)

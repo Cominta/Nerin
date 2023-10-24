@@ -86,6 +86,7 @@
             this.load.TabStop = false;
             this.load.Text = "Load";
             this.load.UseVisualStyleBackColor = false;
+            this.load.Click += new System.EventHandler(this.load_Click);
             // 
             // pictureBox1
             // 
@@ -117,6 +118,7 @@
             this.Save.TabStop = false;
             this.Save.Text = "Save";
             this.Save.UseVisualStyleBackColor = false;
+            this.Save.Click += new System.EventHandler(this.Save_Click);
             // 
             // Compile
             // 
