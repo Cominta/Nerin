@@ -27,6 +27,7 @@ namespace NiDE
         private string _inputText = "";
         private string error_txt = "";
         private bool error = false;
+        private bool isLight = false;
 
 
         public NideMain()
@@ -53,15 +54,69 @@ namespace NiDE
 
             switch (settings.theme)
             {
+                //Classic
                 case -1:
                 case 0:
-                    this.MainTextBox = controler.TextBoxClassicTheme(this);
-                    this.panel1 = controler.PanelClassicTheme(this);
+
+                    MainTextBox = controler.TextBoxClassicTheme(MainTextBox);
+                    panel1 = controler.PanelClassicTheme(panel1);
+                    panel2 = controler.DecorPanelClassicTheme(panel2);
+                    Compile = controler.ButtonClassicTheme(Compile);
+                    Save = controler.ButtonClassicTheme(Save);
+                    load = controler.ButtonClassicTheme(load);
+
+                    console.ConsoleOutput.BackColor = Color.Black;
+                    console.ConsoleOutput.ForeColor = Color.White;
+
+                    isLight = false;
+                    break;
+                
+                //Classic light
+                case 1:
+
+                    MainTextBox = controler.TextBoxLightTheme(MainTextBox);
+                    panel1 = controler.PanelLightTheme(panel1);
+                    panel2 = controler.DecorPanelClassicTheme(panel2);
+                    Compile = controler.ButtonClassicTheme(Compile);
+                    Save = controler.ButtonClassicTheme(Save);
+                    load = controler.ButtonClassicTheme(load);
+
+                    console.ConsoleOutput.BackColor = Color.White;
+                    console.ConsoleOutput.ForeColor = Color.Black;
+
+                    isLight = true;
+                    break;
+                
+                //Purple dark
+                case 2:
+
+                    MainTextBox = controler.TextBoxClassicTheme(MainTextBox);
+                    panel1 = controler.PanelClassicTheme(panel1);
+                    panel2 = controler.PanelPurpleTheme(panel2);
+                    Compile = controler.ButtonPurpleTheme(Compile);
+                    load = controler.ButtonPurpleTheme(load);
+                    Save = controler.ButtonPurpleTheme(Save);
+
+                    console.ConsoleOutput.BackColor = Color.Black;
+                    console.ConsoleOutput.ForeColor = Color.White;
+
+                    isLight = false;
                     break;
 
-                case 1:
-                    this.MainTextBox = controler.TextBoxClassicLightTheme(this);
-                    this.panel1 = controler.PanelClassicLightTheme(this);
+                //Purple light
+                case 3:
+
+                    MainTextBox = controler.TextBoxLightTheme(MainTextBox);
+                    panel1 = controler.PanelLightTheme(panel1);
+                    panel2 = controler.PanelPurpleTheme(panel2);
+                    Compile = controler.ButtonPurpleTheme(Compile);
+                    load = controler.ButtonPurpleTheme(load);
+                    Save = controler.ButtonPurpleTheme(Save);
+
+                    console.ConsoleOutput.BackColor = Color.White;
+                    console.ConsoleOutput.ForeColor = Color.Black;
+
+                    isLight = true;
                     break;
             }
         }
@@ -165,7 +220,15 @@ namespace NiDE
                     }
                 }
 
-                MainTextBox.ForeColor = Color.FromArgb(255, 255, 255);
+                if(isLight)
+                {
+                    MainTextBox.ForeColor = Color.Black;
+                }
+                else
+                {
+                    MainTextBox.ForeColor = Color.White;
+                }
+                
                 error = false;
             }
             catch (Exception ex)
@@ -173,7 +236,6 @@ namespace NiDE
                 error_txt = ex.Message;
                 error = true;
                 MainTextBox.ForeColor = Color.Red;
-
             }
         }
 
@@ -192,14 +254,21 @@ namespace NiDE
             return this.panel1;
         }
 
-        private void NideMain_Load(object sender, EventArgs e)
+        public Button GetCompile()
         {
-            timer1.Start();
+            return this.Compile;
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
+        public Button GetSave()
         {
-            
+            return this.Save;
         }
+
+        public Button GetLoad()
+        {
+            return this.load;
+        }
+
+        private void NideMain_Load(object sender, EventArgs e) { }
     }
 }

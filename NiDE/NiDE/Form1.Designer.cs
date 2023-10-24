@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NideMain));
             this.MainTextBox = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -37,7 +36,6 @@
             this.Save = new System.Windows.Forms.Button();
             this.Compile = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -147,11 +145,6 @@
             this.panel2.Size = new System.Drawing.Size(800, 3);
             this.panel2.TabIndex = 3;
             // 
-            // timer1
-            // 
-            this.timer1.Interval = 10;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
             // NideMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -186,7 +179,6 @@
         private System.Windows.Forms.Button Save;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button load;
-        private System.Windows.Forms.Timer timer1;
     }
 }
 

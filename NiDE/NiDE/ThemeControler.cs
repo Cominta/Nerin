@@ -10,38 +10,58 @@ namespace NiDE.NiDE
 {
     public class ThemeControler
     {
-        public TextBox TextBoxClassicTheme(NideMain nideMain)
+        public TextBox TextBoxClassicTheme(TextBox textBox)
         {
-            TextBox textBox = nideMain.GetTextBox();
             textBox.BackColor = Color.FromArgb(64, 64, 64);
             textBox.ForeColor = Color.White;
 
             return textBox;
         }
 
-        public Panel PanelClassicTheme(NideMain nideMain)
+        public Panel PanelClassicTheme(Panel panel)
         {
-            Panel panel = nideMain.GetPanel();
             panel.BackColor = Color.FromArgb(32, 32, 32);
-
             return panel;
         }
 
-        public TextBox TextBoxClassicLightTheme(NideMain nideMain)
+        public Panel DecorPanelClassicTheme(Panel panel)
         {
-            TextBox textBox = nideMain.GetTextBox();
-            textBox.BackColor = Color.FromArgb(200, 200, 200);
+            panel.BackColor = Color.FromArgb(192, 64, 0);
+            return panel;
+        }
+
+        public Button ButtonClassicTheme(Button button)
+        {
+            button.BackColor = Color.FromArgb(192, 64, 0);
+            return button;
+        }
+
+        public TextBox TextBoxLightTheme(TextBox textBox)
+        {
+            textBox.BackColor = Color.FromArgb(255, 255, 255);
             textBox.ForeColor = Color.Black;
 
             return textBox;
         }
 
-        public Panel PanelClassicLightTheme(NideMain nideMain) 
+        public Panel PanelLightTheme(Panel panel) 
         {
-            Panel panel = nideMain.GetPanel();
-            panel.BackColor = Color.FromArgb(160, 160, 160);
-
+            panel.BackColor = Color.FromArgb(222, 222, 222);
             return panel;
         }
+
+        public Button ButtonPurpleTheme(Button button)
+        {
+            button.BackColor = Color.FromArgb(138, 63, 196);
+            return button;
+        }
+
+        public Panel PanelPurpleTheme(Panel panel)
+        {
+            panel.BackColor = Color.FromArgb(138, 63, 196);
+            return panel;
+        }
+
+        
     }
 }
