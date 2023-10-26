@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using NiDE.NiDE;
+using System.Reflection.Emit;
 
 namespace NiDE
 {
@@ -120,7 +121,12 @@ namespace NiDE
 
                     isLight = true;
                     break;
+
+                default: 
+                    throw new ArgumentException("Visual error");
             }
+
+            MainTextBox.Font = settings.font;
         }
 
         private void NideMain_CtrlF5(object sender, KeyEventArgs e)
@@ -255,12 +261,7 @@ namespace NiDE
 
         private void load_Click(object sender, EventArgs e)
         {
-            MainTextBox.Text = string.Empty;
-
-            List<string> result = loader.Load();
-            _inputText = string.Join("\r\n", result);
-
-            MainTextBox.Text = _inputText;
+            MainTextBox.Text = string.Join("\r\n", loader.Load());
         }
 
         private void NideMain_Load(object sender, EventArgs e) { }

@@ -38,6 +38,8 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.ThemeListBox = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.FontStyle = new System.Windows.Forms.Label();
+            this.FontStyleListBox = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.NumericFont)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -46,7 +48,7 @@
             // 
             this.LabelFont.AutoSize = true;
             this.LabelFont.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LabelFont.Location = new System.Drawing.Point(65, 48);
+            this.LabelFont.Location = new System.Drawing.Point(65, 67);
             this.LabelFont.Name = "LabelFont";
             this.LabelFont.Size = new System.Drawing.Size(72, 19);
             this.LabelFont.TabIndex = 0;
@@ -58,7 +60,7 @@
             this.NumericFont.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.NumericFont.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
             this.NumericFont.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NumericFont.Location = new System.Drawing.Point(150, 48);
+            this.NumericFont.Location = new System.Drawing.Point(150, 67);
             this.NumericFont.Maximum = new decimal(new int[] {
             40,
             0,
@@ -70,13 +72,14 @@
             0,
             0});
             this.NumericFont.Name = "NumericFont";
-            this.NumericFont.Size = new System.Drawing.Size(120, 22);
+            this.NumericFont.Size = new System.Drawing.Size(130, 22);
             this.NumericFont.TabIndex = 1;
             this.NumericFont.Value = new decimal(new int[] {
-            8,
+            12,
             0,
             0,
             0});
+            this.NumericFont.ValueChanged += new System.EventHandler(this.NumericFont_ValueChanged);
             // 
             // Apply
             // 
@@ -148,10 +151,10 @@
             "Classic light",
             "Purple dark",
             "Purple light"});
-            this.ThemeListBox.Location = new System.Drawing.Point(150, 106);
+            this.ThemeListBox.Location = new System.Drawing.Point(150, 163);
             this.ThemeListBox.Name = "ThemeListBox";
             this.ThemeListBox.ScrollAlwaysVisible = true;
-            this.ThemeListBox.Size = new System.Drawing.Size(120, 30);
+            this.ThemeListBox.Size = new System.Drawing.Size(130, 30);
             this.ThemeListBox.TabIndex = 9;
             this.ThemeListBox.SelectedIndexChanged += new System.EventHandler(this.ThemeListBox_SelectedIndexChanged);
             // 
@@ -159,11 +162,38 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(27, 106);
+            this.label1.Location = new System.Drawing.Point(27, 163);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(110, 19);
             this.label1.TabIndex = 10;
             this.label1.Text = "Choose theme:";
+            // 
+            // FontStyle
+            // 
+            this.FontStyle.AutoSize = true;
+            this.FontStyle.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FontStyle.Location = new System.Drawing.Point(57, 111);
+            this.FontStyle.Name = "FontStyle";
+            this.FontStyle.Size = new System.Drawing.Size(80, 19);
+            this.FontStyle.TabIndex = 11;
+            this.FontStyle.Text = "Font style:";
+            // 
+            // FontStyleListBox
+            // 
+            this.FontStyleListBox.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.FontStyleListBox.FormattingEnabled = true;
+            this.FontStyleListBox.Items.AddRange(new object[] {
+            "Consolas",
+            "Times New Roman",
+            "Microsoft Sans Serif",
+            "Arial",
+            "Comic Sans MS"});
+            this.FontStyleListBox.Location = new System.Drawing.Point(150, 111);
+            this.FontStyleListBox.Name = "FontStyleListBox";
+            this.FontStyleListBox.ScrollAlwaysVisible = true;
+            this.FontStyleListBox.Size = new System.Drawing.Size(130, 30);
+            this.FontStyleListBox.TabIndex = 12;
+            this.FontStyleListBox.SelectedIndexChanged += new System.EventHandler(this.FontStyleListBox_SelectedIndexChanged);
             // 
             // Settings
             // 
@@ -171,6 +201,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.ClientSize = new System.Drawing.Size(334, 361);
+            this.Controls.Add(this.FontStyleListBox);
+            this.Controls.Add(this.FontStyle);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ThemeListBox);
             this.Controls.Add(this.panel2);
@@ -200,5 +232,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.ListBox ThemeListBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label FontStyle;
+        private System.Windows.Forms.ListBox FontStyleListBox;
     }
 }

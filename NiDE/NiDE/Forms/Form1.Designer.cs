@@ -47,7 +47,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MainTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.MainTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.MainTextBox.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MainTextBox.Font = new System.Drawing.Font("Comic Sans MS", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.MainTextBox.ForeColor = System.Drawing.Color.White;
             this.MainTextBox.Location = new System.Drawing.Point(0, 65);
             this.MainTextBox.Multiline = true;
